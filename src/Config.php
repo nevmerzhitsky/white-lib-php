@@ -13,7 +13,7 @@ class Config {
             return false;
         }
 
-        foreach (glob(__DIR__ . '/../../../config/*.ini') as $configPath) {
+        foreach (glob(APPBASE . 'config/*.ini') as $configPath) {
             static::initFromFile($configPath);
         }
 

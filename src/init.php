@@ -4,6 +4,9 @@ class ApplicationException extends Exception {}
 
 class DatabaseException extends ApplicationException {}
 
+if (!defined('APPBASE')) {
+    define('APPBASE', __DIR__ . '/../../../');
+}
 if (!defined('WL_INCBASE')) {
     define('WL_INCBASE', __DIR__ . '/');
 }
