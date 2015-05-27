@@ -6,14 +6,14 @@ const ENV_PRODUCTION = 'production';
 
 class Config {
 
-    private static $_data = null;
+    private static $_data = [];
 
     static private function _init () {
-        if (!is_null(static::$_data)) {
+        if (!empty(static::$_data)) {
             return false;
         }
 
-        foreach (glob(__DIR__ . '/../../config/*.ini') as $configPath) {
+        foreach (glob(__DIR__ . '/../../../config/*.ini') as $configPath) {
             static::initFromFile($configPath);
         }
 
