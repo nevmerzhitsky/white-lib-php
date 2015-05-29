@@ -69,8 +69,15 @@ class Config {
      * @return boolean
      */
     static public function isDebugSqlEnabled () {
-        return static::get('app', 'env') == ENV_DEVELOPMENT &&
-                 !empty($_REQUEST['debug_sql']);
+        return static::isDevEnv() && !empty($_REQUEST['debug_sql']);
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    static public function isDevEnv () {
+        return static::get('app', 'env') == ENV_DEVELOPMENT;
     }
 
     /**
