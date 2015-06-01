@@ -35,9 +35,16 @@ class JsonService {
     }
 
     private function _defaultExceptionParser (\Exception $e) {
+        $message = $e->getMessage();
+
+        // Hide unsecure info.
+        if (!\Config::isDevEnv() && $e instanceof \PDOException) {
+            $message = 'Some database error.';
+        }
+
         return [
             'status' => 'error',
-            'message' => $e->getMessage()
+            'message' => $message
         ];
     }
 }
