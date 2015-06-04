@@ -28,7 +28,7 @@ class Config {
      */
     static public function initFromFile ($configPath, $section = null) {
         if (!file_exists($configPath)) {
-            return false;
+            throw new ApplicationException("Config file '{$configPath}' does not exists");
         }
 
         if (is_null($section)) {
