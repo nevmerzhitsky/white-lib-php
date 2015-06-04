@@ -15,6 +15,7 @@ require_once WL_INCBASE . 'Config.php';
 require_once WL_INCBASE . 'Navbar.php';
 require_once WL_INCBASE . 'Pagination.php';
 require_once WL_INCBASE . 'DB/QueryWhere.php';
+require_once WL_INCBASE . 'Service/JsonService.php';
 
 require_once WL_INCBASE . 'functions.php';
 require_once WL_INCBASE . 'profiling.php';
