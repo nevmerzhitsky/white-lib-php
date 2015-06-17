@@ -6,6 +6,8 @@ const ENV_PRODUCTION = 'production';
 
 class Config {
 
+    private static $_pathes = [];
+
     private static $_data = [];
 
     static private function _init () {
@@ -35,6 +37,7 @@ class Config {
             $section = pathinfo($configPath)['filename'];
         }
 
+        static::$_pathes[$section] = realpath($configPath);
         static::$_data[$section] = parse_ini_file($configPath, false,
                 INI_SCANNER_NORMAL);
 
@@ -62,6 +65,24 @@ class Config {
         }
 
         return static::$_data[$section][$option];
+    }
+
+    /**
+     *
+     * @param string $section
+     * @param string $option
+     * @return scalar
+     */
+    static public function getPath ($section, $option) {
+        $result = static::get($section, $option);
+
+        // Stupid check a path is absolute. For Linux only.
+        if ('/' !== $result[0]) {
+            $result = dirname(static::$_pathes[$section]) . DIRECTORY_SEPARATOR .
+                     $result;
+        }
+
+        return $result;
     }
 
     /**
