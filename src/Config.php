@@ -30,7 +30,8 @@ class Config {
      */
     static public function initFromFile ($configPath, $section = null) {
         if (!file_exists($configPath)) {
-            throw new ApplicationException("Config file '{$configPath}' does not exists");
+            throw new ApplicationException(
+                    "Config file '{$configPath}' does not exists");
         }
 
         if (is_null($section)) {
@@ -48,7 +49,7 @@ class Config {
      *
      * @param string $section
      * @param string $option
-     * @return scalar
+     * @return mixed
      */
     static public function get ($section, $option) {
         static::_init();
@@ -71,7 +72,7 @@ class Config {
      *
      * @param string $section
      * @param string $option
-     * @return scalar
+     * @return string
      */
     static public function getPath ($section, $option) {
         $result = static::get($section, $option);
@@ -83,6 +84,18 @@ class Config {
         }
 
         return $result;
+    }
+
+    /**
+     *
+     * @param string $section
+     * @param string $option
+     * @return integer
+     */
+    static public function getInteger ($section, $option) {
+        $result = static::get($section, $option);
+
+        return intval($result, 0);
     }
 
     /**
