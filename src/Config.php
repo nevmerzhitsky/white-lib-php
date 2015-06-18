@@ -39,8 +39,15 @@ class Config {
         }
 
         static::$_pathes[$section] = realpath($configPath);
-        static::$_data[$section] = parse_ini_file($configPath, false,
-                INI_SCANNER_NORMAL);
+
+        $fileData = parse_ini_file($configPath, false, INI_SCANNER_NORMAL);
+
+        if (!is_array($fileData)) {
+            throw new ApplicationException(
+                    "Some error while parsing config '{$section}'");
+        }
+
+        static::$_data[$section] = $fileData;
 
         return true;
     }
@@ -66,6 +73,22 @@ class Config {
         }
 
         return static::$_data[$section][$option];
+    }
+
+    /**
+     * Syntactic sugar for reduce length of code for get config values.
+     *
+     * @param string $name Name of config section.
+     * @param array $arguments
+     * @return mixed
+     */
+    static public function __callStatic ($name, $arguments) {
+        array_unshift($arguments, $name);
+
+        return call_user_func_array([
+            'static',
+            'get'
+        ], $arguments);
     }
 
     /**
@@ -111,7 +134,7 @@ class Config {
      * @return boolean
      */
     static public function isDevEnv () {
-        return static::get('app', 'env') == ENV_DEVELOPMENT;
+        return static::app('env') == ENV_DEVELOPMENT;
     }
 
     /**
