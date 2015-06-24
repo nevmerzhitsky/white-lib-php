@@ -174,3 +174,16 @@ function join_arrays () {
 
     return $result;
 }
+
+/**
+ *
+ * @param array $data
+ * @return array
+ */
+function quote_array (array $data) {
+    return array_map(
+            [
+                getDb(),
+                'quote'
+            ], $data);
+}
