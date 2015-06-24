@@ -41,7 +41,15 @@ class JsonService {
             $response = $exceptionParser($e);
         }
 
+        if (is_null($response)) {
+            return null;
+        }
+
         $result = json_encode($response);
+
+        if ($result === false) {
+            return null;
+        }
 
         if ($this->_autoEchoResponse) {
             if ($this->_gzipResponse) {
@@ -54,6 +62,7 @@ class JsonService {
                 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
                 header('Access-Control-Allow-Headers: Authorization');
             }
+
             echo $result;
         }
 
