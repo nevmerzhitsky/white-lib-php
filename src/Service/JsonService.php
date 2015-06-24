@@ -3,6 +3,23 @@ namespace Service;
 
 class JsonService {
 
+    /**
+     *
+     * @var boolean
+     */
+    private $_autoEchoResponse = false;
+
+    /**
+     *
+     * @var boolean
+     */
+    private $_gzipResponse = false;
+
+    public function __construct ($autoEchoResponse = true, $gzipResponse = true) {
+        $this->_autoEchoResponse = !empty($autoEchoResponse);
+        $this->_gzipResponse = !empty($gzipResponse);
+    }
+
     public function handleRequest ($handlerFunc, $exceptionParser = null) {
         if (is_null($exceptionParser)) {
             $exceptionParser = [
@@ -24,14 +41,23 @@ class JsonService {
             $response = $exceptionParser($e);
         }
 
-        header('Content-type: application/json; charset=utf-8');
-        if (\Config::isDevEnv()) {
-            header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-            header('Access-Control-Allow-Headers: Authorization');
+        $result = json_encode($response);
+
+        if ($this->_autoEchoResponse) {
+            if ($this->_gzipResponse) {
+                ob_start('ob_gzhandler');
+            }
+
+            header('Content-type: application/json; charset=utf-8');
+            if (\Config::isDevEnv()) {
+                header('Access-Control-Allow-Origin: *');
+                header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+                header('Access-Control-Allow-Headers: Authorization');
+            }
+            echo $result;
         }
 
-        return json_encode($response);
+        return $result;
     }
 
     private function _defaultExceptionParser (\Exception $e) {
