@@ -105,6 +105,11 @@ abstract class AbstractQueryWhere implements QueryWhere {
         self::OP_NALL
     ];
 
+    protected static $_NOBIND_OPS = [
+        self::OP_IN,
+        self::OP_NIN
+    ];
+
     static public function getAvailableOperators () {
         return [
             static::OP_EQ,
@@ -246,7 +251,7 @@ abstract class AbstractQueryWhere implements QueryWhere {
         foreach ($this->_simpleConditions as $alias => $values) {
             foreach ($values as $value) {
                 $result[] = $this->_valueToWhere($this->_fields[$alias],
-                        $alias . $counter++, $value[0]);
+                        $alias . $counter++, $value[0], $value[1]);
             }
         }
 
@@ -270,21 +275,15 @@ abstract class AbstractQueryWhere implements QueryWhere {
 
         foreach ($this->_simpleConditions as $alias => $values) {
             foreach ($values as $value) {
-                if (in_array($value[0], static::$_UNARY_OPS)) {
-                    $counter++;
-                    continue;
-                }
-
-                if (in_array($value[0],
-                        [
-                            static::OP_BETWEEN
-                        ]) && count($value[1]) == 2) {
+                if (static::OP_BETWEEN == $value[0] && count($value[1]) == 2) {
                     $result[$alias . $counter . '_from'] = $value[1][0];
                     $result[$alias . $counter . '_to'] = $value[1][1];
-                    $counter++;
-                } else {
-                    $result[$alias . $counter++] = $value[1];
+                } elseif (!in_array($value[0], static::$_UNARY_OPS) &&
+                         !in_array($value[0], static::$_NOBIND_OPS)) {
+                    $result[$alias . $counter] = $value[1];
                 }
+
+                $counter++;
             }
         }
 
@@ -306,15 +305,25 @@ abstract class AbstractQueryWhere implements QueryWhere {
      * @param string $sqlForm
      * @param string $paramName
      * @param string $operator
+     * @param mixed $value
      * @return string
      */
-    protected function _valueToWhere ($sqlForm, $paramName, $operator) {
+    protected function _valueToWhere ($sqlForm, $paramName, $operator, $value) {
         if (in_array($operator, static::$_UNARY_OPS)) {
             return sprintf('%s %s', $sqlForm, $operator);
         }
 
         if (in_array($operator, static::$_ARRAY_OPS)) {
             return sprintf(':%s %s (%s)', $paramName, $operator, $sqlForm);
+        }
+
+        if (is_array($value) && !empty($value) && in_array($operator,
+                [
+                    static::OP_IN,
+                    static::OP_NIN
+                ])) {
+            return sprintf('%s %s (%s)', $sqlForm, $operator,
+                    implode(',', quote_array($value)));
         }
 
         if (in_array($operator,
