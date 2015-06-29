@@ -33,6 +33,18 @@ interface QueryWhere {
 
     const OP_NANY = '!= ANY';
 
+    const OP_SOME = '= SOME';
+
+    const OP_NSOME = '!= SOME';
+
+    const OP_ALL = '= ALL';
+
+    const OP_NALL = '!= ALL';
+
+    const OP_ISNULL = 'IS NULL';
+
+    const OP_NOTNULL = 'IS NOT NULL';
+
     const OP_BETWEEN = 'BETWEEN';
 
     /**
@@ -79,6 +91,20 @@ interface QueryWhere {
 
 abstract class AbstractQueryWhere implements QueryWhere {
 
+    protected static $_UNARY_OPS = [
+        self::OP_ISNULL,
+        self::OP_NOTNULL
+    ];
+
+    protected static $_ARRAY_OPS = [
+        self::OP_ANY,
+        self::OP_NANY,
+        self::OP_SOME,
+        self::OP_NSOME,
+        self::OP_ALL,
+        self::OP_NALL
+    ];
+
     static public function getAvailableOperators () {
         return [
             static::OP_EQ,
@@ -95,6 +121,12 @@ abstract class AbstractQueryWhere implements QueryWhere {
             static::OP_NIN,
             static::OP_ANY,
             static::OP_NANY,
+            static::OP_SOME,
+            static::OP_NSOME,
+            static::OP_ALL,
+            static::OP_NALL,
+            static::OP_ISNULL,
+            static::OP_NOTNULL,
             static::OP_BETWEEN
         ];
     }
@@ -238,12 +270,17 @@ abstract class AbstractQueryWhere implements QueryWhere {
 
         foreach ($this->_simpleConditions as $alias => $values) {
             foreach ($values as $value) {
+                if (in_array($value[0], static::$_UNARY_OPS)) {
+                    $counter++;
+                    continue;
+                }
+
                 if (in_array($value[0],
                         [
                             static::OP_BETWEEN
                         ]) && count($value[1]) == 2) {
-                    $result[$alias . $counter .'_from'] = $value[1][0];
-                    $result[$alias . $counter .'_to'] = $value[1][1];
+                    $result[$alias . $counter . '_from'] = $value[1][0];
+                    $result[$alias . $counter . '_to'] = $value[1][1];
                     $counter++;
                 } else {
                     $result[$alias . $counter++] = $value[1];
@@ -272,11 +309,11 @@ abstract class AbstractQueryWhere implements QueryWhere {
      * @return string
      */
     protected function _valueToWhere ($sqlForm, $paramName, $operator) {
-        if (in_array($operator,
-                [
-                    static::OP_ANY,
-                    static::OP_NANY
-                ])) {
+        if (in_array($operator, static::$_UNARY_OPS)) {
+            return sprintf('%s %s', $sqlForm, $operator);
+        }
+
+        if (in_array($operator, static::$_ARRAY_OPS)) {
             return sprintf(':%s %s (%s)', $paramName, $operator, $sqlForm);
         }
 
