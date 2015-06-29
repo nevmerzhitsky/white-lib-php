@@ -35,6 +35,12 @@ class JsonService {
             throw new \ApplicationException('exceptionParser should be callable');
         }
 
+        if ($this->_autoEchoResponse) {
+            if ($this->_gzipResponse) {
+                ob_start('ob_gzhandler');
+            }
+        }
+
         try {
             $response = $handlerFunc();
         } catch (\Exception $e) {
@@ -52,10 +58,6 @@ class JsonService {
         }
 
         if ($this->_autoEchoResponse) {
-            if ($this->_gzipResponse) {
-                ob_start('ob_gzhandler');
-            }
-
             header('Content-type: application/json; charset=utf-8');
             if (\Config::isDevEnv()) {
                 header('Access-Control-Allow-Origin: *');
