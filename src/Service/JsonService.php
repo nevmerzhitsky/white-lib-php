@@ -15,9 +15,28 @@ class JsonService {
      */
     private $_gzipResponse = false;
 
-    public function __construct ($autoEchoResponse = true, $gzipResponse = true) {
+    /**
+     *
+     * @var integer|null
+     */
+    private $_jsonEncodeOptions = null;
+
+    public function __construct ($autoEchoResponse = true, $gzipResponse = true,
+            $jsonEncodeOptions = null) {
         $this->_autoEchoResponse = !empty($autoEchoResponse);
         $this->_gzipResponse = !empty($gzipResponse);
+        $this->setJsonEncodeOptions($jsonEncodeOptions);
+    }
+
+    /**
+     *
+     * @param integer|null $value
+     */
+    public function setJsonEncodeOptions ($value) {
+        $this->_jsonEncodeOptions = intval($value);
+        if (!$this->_jsonEncodeOptions) {
+            $this->_jsonEncodeOptions = null;
+        }
     }
 
     public function handleRequest ($handlerFunc, $exceptionParser = null) {
@@ -51,7 +70,7 @@ class JsonService {
             return null;
         }
 
-        $result = json_encode($response);
+        $result = json_encode($response, $this->_jsonEncodeOptions);
 
         if ($result === false) {
             return null;
