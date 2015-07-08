@@ -187,3 +187,91 @@ function quote_array (array $data) {
                 'quote'
             ], $data);
 }
+
+const PHP_URL_FULL_HOST = -1;
+
+const PHP_URL_FULL_HOST_WITHOUT_SCHEME = -2;
+
+const PHP_URL_FULL_PATH = -3;
+
+/**
+ * Parse a URL in more usable way as the parse_url().
+ * Use PHP_URL_FULL_* constants.
+ *
+ * @param string $url
+ * @param integer[] $components Array of PHP_URL_* constants.
+ * @return scalar[]|false
+ */
+function parse_url_smart ($url, array $components) {
+    static $componentsMap = [
+        PHP_URL_SCHEME => 'scheme',
+        PHP_URL_HOST => 'host',
+        PHP_URL_PORT => 'port',
+        PHP_URL_USER => 'user',
+        PHP_URL_PASS => 'pass',
+        PHP_URL_PATH => 'path',
+        PHP_URL_QUERY => 'query',
+        PHP_URL_FRAGMENT => 'fragment'
+    ];
+
+    $components = array_unique($components);
+    $parts = parse_url($url);
+
+    if (false === $parts) {
+        return false;
+    }
+
+    $result = [];
+
+    foreach ($components as $component) {
+        if (array_key_exists($component, $componentsMap)) {
+            if (array_key_exists($componentsMap[$component], $parts)) {
+                $value = $parts[$componentsMap[$component]];
+            } else {
+                $value = null;
+            }
+
+            $result[$component] = $value;
+        } elseif (PHP_URL_FULL_HOST == $component ||
+                 PHP_URL_FULL_HOST_WITHOUT_SCHEME == $component) {
+            $value = [];
+
+            if (PHP_URL_FULL_HOST == $component &&
+                     array_key_exists('scheme', $parts)) {
+                $value[] = "{$parts['scheme']}://";
+            }
+            if (array_key_exists('user', $parts)) {
+                $temp = $parts['user'];
+
+                if (array_key_exists('pass', $parts)) {
+                    $temp .= ":{$parts['pass']}";
+                }
+
+                $value[] = "{$temp}@";
+            }
+            if (array_key_exists('host', $parts)) {
+                $value[] = "{$parts['host']}";
+            }
+
+            $value = implode('', $value);
+            $result[$component] = '' !== $value ? $value : null;
+        } elseif (PHP_URL_FULL_PATH == $component) {
+            $value = [];
+
+            if (array_key_exists('path', $parts)) {
+                $value[] = $parts['path'];
+            }
+            if (array_key_exists('query', $parts)) {
+                $value[] = "?{$parts['query']}";
+            }
+            if (array_key_exists('fragment', $parts)) {
+                $value[] = "#{$parts['fragment']}";
+            }
+
+            $value = implode('', $value);
+            $result[$component] = '' !== $value ? $value : null;
+        }
+    }
+
+    return $result;
+}
