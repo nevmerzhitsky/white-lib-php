@@ -85,10 +85,11 @@ class Config {
     static public function __callStatic ($name, $arguments) {
         array_unshift($arguments, $name);
 
-        return call_user_func_array([
-            'static',
-            'get'
-        ], $arguments);
+        return call_user_func_array(
+                [
+                    'static',
+                    'get'
+                ], $arguments);
     }
 
     /**
@@ -127,6 +128,14 @@ class Config {
      */
     static public function isDebugSqlEnabled () {
         return static::isDevEnv() && !empty($_REQUEST['debug_sql']);
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    static public function isDebugProfilingEnabled () {
+        return static::isDevEnv() && !empty($_REQUEST['debug_profile']);
     }
 
     /**
