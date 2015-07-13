@@ -17,6 +17,12 @@ class JsonService {
 
     /**
      *
+     * @var boolean
+     */
+    private $_supportJsonp = true;
+
+    /**
+     *
      * @var integer|null
      */
     private $_jsonEncodeOptions = null;
@@ -37,6 +43,14 @@ class JsonService {
         if (!$this->_jsonEncodeOptions) {
             $this->_jsonEncodeOptions = null;
         }
+    }
+
+    /**
+     *
+     * @param boolean $value
+     */
+    public function setSupportJsonp ($value) {
+        $this->_supportJsonp = !empty($value);
     }
 
     public function handleRequest ($handlerFunc, $exceptionParser = null) {
@@ -74,6 +88,12 @@ class JsonService {
 
         if ($result === false) {
             return null;
+        }
+
+        // Wrap for JSONP response.
+        if ($this->_supportJsonp && !empty($_REQUEST['callback']) &&
+                 preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
+            $result = "{$_REQUEST['callback']}({$result})";
         }
 
         if ($this->_autoEchoResponse) {
