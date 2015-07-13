@@ -100,7 +100,7 @@ class JsonService {
             header('Content-type: application/json; charset=utf-8');
             if (\Config::isDevEnv()) {
                 header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+                header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
                 header('Access-Control-Allow-Headers: Authorization');
             }
 

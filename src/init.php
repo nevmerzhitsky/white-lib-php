@@ -11,6 +11,7 @@ if (!defined('WL_INCBASE')) {
     define('WL_INCBASE', __DIR__ . '/');
 }
 
+require_once WL_INCBASE . 'AbstractHttpController.php';
 require_once WL_INCBASE . 'Config.php';
 require_once WL_INCBASE . 'Navbar.php';
 require_once WL_INCBASE . 'Pagination.php';
