@@ -275,3 +275,14 @@ function parse_url_smart ($url, array $components) {
 
     return $result;
 }
+
+/**
+ * Order associative $source by order of $order elements.
+ *
+ * @param array $source
+ * @param array $order
+ * @return array
+ */
+function sortArrayKeysByOther (array $source, array $order) {
+    return array_merge(array_flip(array_values($order)), $source);
+}
