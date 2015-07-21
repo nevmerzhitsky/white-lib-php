@@ -111,8 +111,12 @@ class Config {
     static public function getPath ($section, $option, $default = null) {
         $result = static::get($section, $option, $default);
 
+        if (empty($result)) {
+            return '';
+        }
+
         // Stupid check a path is absolute. For Linux only.
-        if ('/' !== $result[0]) {
+        if ('/' !== substr($result, 0, 1)) {
             $result = dirname(static::$_pathes[$section]) . DIRECTORY_SEPARATOR .
                      $result;
         }
