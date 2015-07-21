@@ -56,18 +56,28 @@ class Config {
      *
      * @param string $section
      * @param string $option
+     * @param null|mixed $default
      * @return mixed
      */
-    static public function get ($section, $option) {
+    static public function get ($section, $option, $default = null) {
         static::_init();
         $section = trim($section);
         $option = trim($option);
 
         if (!array_key_exists($section, static::$_data)) {
+            if (!is_null($default)) {
+                return $default;
+            }
+
             throw new ApplicationException(
                     "Config does not have '{$section}' section");
         }
+
         if (!array_key_exists($option, static::$_data[$section])) {
+            if (!is_null($default)) {
+                return $default;
+            }
+
             throw new ApplicationException(
                     "Config does not have '{$section}.{$option}' option");
         }
@@ -98,8 +108,8 @@ class Config {
      * @param string $option
      * @return string
      */
-    static public function getPath ($section, $option) {
-        $result = static::get($section, $option);
+    static public function getPath ($section, $option, $default = null) {
+        $result = static::get($section, $option, $default);
 
         // Stupid check a path is absolute. For Linux only.
         if ('/' !== $result[0]) {
@@ -116,8 +126,8 @@ class Config {
      * @param string $option
      * @return integer
      */
-    static public function getInteger ($section, $option) {
-        $result = static::get($section, $option);
+    static public function getInteger ($section, $option, $default = null) {
+        $result = static::get($section, $option, $default);
 
         return intval($result, 0);
     }
@@ -152,8 +162,8 @@ class Config {
      * @param string $option
      * @return scalar[]
      */
-    static public function parseDsn ($section, $option) {
-        $parts = explode(';', static::get($section, $option));
+    static public function parseDsn ($section, $option, $default = null) {
+        $parts = explode(';', static::get($section, $option, $default));
         $result = [];
 
         foreach ($parts as $part) {
