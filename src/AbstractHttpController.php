@@ -88,7 +88,8 @@ class AbstractHttpController {
             header('Allow: ' . implode(',', $methods));
         }
 
-        throw new HttpControllerException('Unsupported HTTP method for this action', 405);
+        throw new HttpControllerException(
+                'Unsupported HTTP method for this action', 405);
     }
 
     /**
@@ -118,9 +119,11 @@ class AbstractHttpController {
         if (static::PARAMS_SOURCE_JSON_POST == $source) {
             $this->_post = file_get_contents('php://input');
             $this->_json = json_decode($this->_post, true);
+            $this->_logRequest();
 
             if (empty($this->_post) || empty($this->_json)) {
-                throw new HttpControllerException('Unable to parse JSON in request body', 400);
+                throw new HttpControllerException(
+                        'Unable to parse JSON in request body', 400);
             }
         }
 
@@ -168,5 +171,20 @@ class AbstractHttpController {
             $source,
             $requestParams
         ];
+    }
+
+    private function _logRequest () {
+        $logPath = Config::getPath('app', 'controller_request_log', '');
+
+        if (empty($logPath)) {
+            return;
+        }
+        if (!file_exists($logPath) && !is_writable(dirname($logPath))) {
+            return;
+        }
+
+        file_put_contents($logPath,
+                sprintf('[%s] %s %s' . PHP_EOL, date('Y-m-d H:i:s'),
+                        $_SERVER['REQUEST_URI'], $this->_post), FILE_APPEND);
     }
 }
