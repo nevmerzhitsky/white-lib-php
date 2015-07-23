@@ -232,6 +232,16 @@ abstract class AbstractQueryWhere implements QueryWhere {
 
     /**
      *
+     * @param string $field
+     */
+    public function clearSimpleCondition ($field) {
+        if (array_key_exists($field, $this->_simpleConditions)) {
+            $this->_simpleConditions[$field] = [];
+        }
+    }
+
+    /**
+     *
      * @return boolean
      */
     protected function _isHaveConditions () {
