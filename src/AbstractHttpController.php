@@ -37,6 +37,10 @@ class AbstractHttpController {
             return;
         }
 
+        if (!method_exists($this, $actionMethodName)) {
+            throw new HttpControllerException('No released handler for this action', 400);
+        }
+
         if (!$this->_prepareActionParams($action)) {
             return;
         }
