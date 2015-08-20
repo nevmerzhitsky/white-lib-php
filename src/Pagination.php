@@ -84,6 +84,7 @@ class Pagination {
      *
      * @param integer $pageNumber
      * @param integer $neighbors
+     * @param boolean $alwaysEdges
      * @return array
      */
     public function getNav ($pageNumber, $neighbors = 3, $alwaysEdges = true) {
@@ -160,6 +161,25 @@ HTML;
     public function getJSONNav ($page, array $nav) {
         return [
             'page' => intval($page),
+            'total_pages' => $this->_totalPages,
+            'total_count' => $this->_totalCount,
+            'on_page' => $this->_onPage,
+            'nav' => $nav
+        ];
+    }
+
+    /**
+     *
+     * @param integer $pageNumber
+     * @param integer $neighbors
+     * @param boolean $alwaysEdges
+     * @return array
+     */
+    public function getNavForJson ($pageNumber, $neighbors = 3, $alwaysEdges = true) {
+        $nav = $this->getNav($pageNumber, $neighbors, $alwaysEdges);
+
+        return [
+            'page' => intval($pageNumber),
             'total_pages' => $this->_totalPages,
             'total_count' => $this->_totalCount,
             'on_page' => $this->_onPage,
