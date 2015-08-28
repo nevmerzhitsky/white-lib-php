@@ -136,6 +136,10 @@ abstract class AbstractQueryWhere implements QueryWhere {
         ];
     }
 
+    const SIMPLE_VALUE = 'value';
+
+    const SIMPLE_OPERATOR = 'operator';
+
     /**
      *
      * @var scalar[]
@@ -201,8 +205,8 @@ abstract class AbstractQueryWhere implements QueryWhere {
         }
 
         $this->_simpleConditions[$field][] = [
-            $operator,
-            $value
+            static::SIMPLE_VALUE => $value,
+            static::SIMPLE_OPERATOR => $operator,
         ];
     }
 
@@ -259,9 +263,9 @@ abstract class AbstractQueryWhere implements QueryWhere {
 
         // @TODO Complete logic for various comparison operators (BETWEEN).
         foreach ($this->_simpleConditions as $alias => $values) {
-            foreach ($values as $value) {
+            foreach ($values as $settings) {
                 $result[] = $this->_valueToWhere($this->_fields[$alias],
-                        $alias . $counter++, $value[0], $value[1]);
+                        $alias . $counter++, $settings);
             }
         }
 
@@ -284,13 +288,20 @@ abstract class AbstractQueryWhere implements QueryWhere {
         $result = [];
 
         foreach ($this->_simpleConditions as $alias => $values) {
-            foreach ($values as $value) {
-                if (static::OP_BETWEEN == $value[0] && count($value[1]) == 2) {
-                    $result[$alias . $counter . '_from'] = $value[1][0];
-                    $result[$alias . $counter . '_to'] = $value[1][1];
-                } elseif (!in_array($value[0], static::$_UNARY_OPS) &&
-                         !in_array($value[0], static::$_NOBIND_OPS)) {
-                    $result[$alias . $counter] = $value[1];
+            foreach ($values as $settings) {
+                if (static::OP_BETWEEN == $settings[static::SIMPLE_OPERATOR]) {
+                    if (count($settings[static::SIMPLE_VALUE]) != 2) {
+                        throw new ApplicationException(
+                                'Value for BETWEEN operator should be array of two elements');
+                    }
+
+                    $result[$alias . $counter . '_from'] = $settings[static::SIMPLE_VALUE][0];
+                    $result[$alias . $counter . '_to'] = $settings[static::SIMPLE_VALUE][1];
+                } elseif (!in_array($settings[static::SIMPLE_OPERATOR],
+                        static::$_UNARY_OPS) &&
+                         !in_array($settings[static::SIMPLE_OPERATOR],
+                                static::$_NOBIND_OPS)) {
+                    $result[$alias . $counter] = $settings[static::SIMPLE_VALUE];
                 }
 
                 $counter++;
@@ -314,37 +325,41 @@ abstract class AbstractQueryWhere implements QueryWhere {
      *
      * @param string $sqlForm
      * @param string $paramName
-     * @param string $operator
-     * @param mixed $value
+     * @param array[] $settings
      * @return string
      */
-    protected function _valueToWhere ($sqlForm, $paramName, $operator, $value) {
-        if (in_array($operator, static::$_UNARY_OPS)) {
-            return sprintf('%s %s', $sqlForm, $operator);
+    protected function _valueToWhere ($sqlForm, $paramName, array $settings) {
+        if (in_array($settings[static::SIMPLE_OPERATOR], static::$_UNARY_OPS)) {
+            return sprintf('%s %s', $sqlForm,
+                    $settings[static::SIMPLE_OPERATOR]);
         }
 
-        if (in_array($operator, static::$_ARRAY_OPS)) {
-            return sprintf(':%s %s (%s)', $paramName, $operator, $sqlForm);
+        if (in_array($settings[static::SIMPLE_OPERATOR], static::$_ARRAY_OPS)) {
+            return sprintf(':%s %s (%s)', $paramName,
+                    $settings[static::SIMPLE_OPERATOR], $sqlForm);
         }
 
-        if (is_array($value) && !empty($value) && in_array($operator,
+        if (is_array($settings[static::SIMPLE_VALUE]) && in_array(
+                $settings[static::SIMPLE_OPERATOR],
                 [
                     static::OP_IN,
                     static::OP_NIN
                 ])) {
-            return sprintf('%s %s (%s)', $sqlForm, $operator,
-                    implode(',', quote_array($value)));
+            return sprintf('%s %s (%s)', $sqlForm,
+                    $settings[static::SIMPLE_OPERATOR],
+                    implode(',', quote_array($settings[static::SIMPLE_VALUE])));
         }
 
-        if (in_array($operator,
+        if (in_array($settings[static::SIMPLE_OPERATOR],
                 [
                     static::OP_BETWEEN
                 ])) {
-            return sprintf('%s %s :%3$s_from AND :%3$s_to', $sqlForm, $operator,
-                    $paramName);
+            return sprintf('%s %s :%3$s_from AND :%3$s_to', $sqlForm,
+                    $settings[static::SIMPLE_OPERATOR], $paramName);
         }
 
-        return sprintf('%s %s (:%s)', $sqlForm, $operator, $paramName);
+        return sprintf('%s %s (:%s)', $sqlForm,
+                $settings[static::SIMPLE_OPERATOR], $paramName);
     }
 }
 
