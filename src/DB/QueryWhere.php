@@ -25,27 +25,47 @@ interface QueryWhere {
 
     const OP_NILIKE = 'NOT ILIKE';
 
+    const OP_CONTAINS = '@>';
+
+    const OP_NCONTAINS = 'NOT @>';
+
+    const OP_CONTAINED = '<@';
+
+    const OP_NCONTAINED = 'NOT <@';
+
+    const OP_OVERLAP = '&&';
+
+    const OP_NOVERLAP = 'NOT &&';
+
+    const OP_INET_CONTAINED = '<<';
+
+    const OP_INET_NCONTAINED = 'NOT <<';
+
+    const OP_INET_CONTAINED_EQUAL = '<<=';
+
+    const OP_INET_NCONTAINED_EQUAL = 'NOT <<=';
+
+    const OP_INET_CONTAINS = '>>';
+
+    const OP_INET_NCONTAINS = 'NOT >>';
+
+    const OP_INET_CONTAINS_EQUAL = '>>=';
+
+    const OP_INET_NCONTAINS_EQUAL = 'NOT >>=';
+
     const OP_IN = 'IN';
 
     const OP_NIN = 'NOT IN';
-
-    const OP_ANY = '= ANY';
-
-    const OP_NANY = '!= ANY';
-
-    const OP_SOME = '= SOME';
-
-    const OP_NSOME = '!= SOME';
-
-    const OP_ALL = '= ALL';
-
-    const OP_NALL = '!= ALL';
 
     const OP_ISNULL = 'IS NULL';
 
     const OP_NOTNULL = 'IS NOT NULL';
 
     const OP_BETWEEN = 'BETWEEN';
+
+    const ARRAY_SUF_ANY = 'ANY';
+
+    const ARRAY_SUF_ALL = 'ALL';
 
     /**
      *
@@ -64,7 +84,8 @@ interface QueryWhere {
      */
     function addField ($alias, $sqlForm = null);
 
-    function addSimpleCondition ($field, $value, $operator = self::OP_EQ);
+    function addSimpleCondition ($field, $value, $operator = self::OP_EQ,
+            $arraySuffix = null);
 
     function clearAllConditions ();
 
@@ -96,15 +117,6 @@ abstract class AbstractQueryWhere implements QueryWhere {
         self::OP_NOTNULL
     ];
 
-    protected static $_ARRAY_OPS = [
-        self::OP_ANY,
-        self::OP_NANY,
-        self::OP_SOME,
-        self::OP_NSOME,
-        self::OP_ALL,
-        self::OP_NALL
-    ];
-
     protected static $_NOBIND_OPS = [
         self::OP_IN,
         self::OP_NIN
@@ -122,23 +134,40 @@ abstract class AbstractQueryWhere implements QueryWhere {
             static::OP_NLIKE,
             static::OP_ILIKE,
             static::OP_NILIKE,
+            static::OP_CONTAINS,
+            static::OP_NCONTAINS,
+            static::OP_CONTAINED,
+            static::OP_NCONTAINED,
+            static::OP_OVERLAP,
+            static::OP_NOVERLAP,
+            static::OP_INET_CONTAINED,
+            static::OP_INET_NCONTAINED,
+            static::OP_INET_CONTAINED_EQUAL,
+            static::OP_INET_NCONTAINED_EQUAL,
+            static::OP_INET_CONTAINS,
+            static::OP_INET_NCONTAINS,
+            static::OP_INET_CONTAINS_EQUAL,
+            static::OP_INET_NCONTAINS_EQUAL,
             static::OP_IN,
             static::OP_NIN,
-            static::OP_ANY,
-            static::OP_NANY,
-            static::OP_SOME,
-            static::OP_NSOME,
-            static::OP_ALL,
-            static::OP_NALL,
             static::OP_ISNULL,
             static::OP_NOTNULL,
             static::OP_BETWEEN
         ];
     }
 
+    static public function getAvailableArraySuffixes () {
+        return [
+            static::ARRAY_SUF_ALL,
+            static::ARRAY_SUF_ANY
+        ];
+    }
+
     const SIMPLE_VALUE = 'value';
 
     const SIMPLE_OPERATOR = 'operator';
+
+    const SIMPLE_ARRAY_SUFFIX = 'array_suffix';
 
     /**
      *
@@ -199,7 +228,16 @@ abstract class AbstractQueryWhere implements QueryWhere {
         }
     }
 
-    public function addSimpleCondition ($field, $value, $operator = self::OP_EQ) {
+    public function addSimpleCondition ($field, $value, $operator = self::OP_EQ,
+            $arraySuffix = null) {
+        if (!in_array($operator, static::getAvailableOperators())) {
+            throw new ApplicationException("Unknown operator '{$operator}'");
+        }
+        if (!is_null($arraySuffix) &&
+                 !in_array($arraySuffix, static::getAvailableArraySuffixes())) {
+            throw new ApplicationException(
+                    "Unknown array suffix '{$arraySuffix}'");
+        }
         if (!array_key_exists($field, $this->_simpleConditions)) {
             throw new ApplicationException("Not inited field '{$field}'");
         }
@@ -207,6 +245,7 @@ abstract class AbstractQueryWhere implements QueryWhere {
         $this->_simpleConditions[$field][] = [
             static::SIMPLE_VALUE => $value,
             static::SIMPLE_OPERATOR => $operator,
+            static::SIMPLE_ARRAY_SUFFIX => $arraySuffix
         ];
     }
 
@@ -298,9 +337,8 @@ abstract class AbstractQueryWhere implements QueryWhere {
                     $result[$alias . $counter . '_from'] = $settings[static::SIMPLE_VALUE][0];
                     $result[$alias . $counter . '_to'] = $settings[static::SIMPLE_VALUE][1];
                 } elseif (!in_array($settings[static::SIMPLE_OPERATOR],
-                        static::$_UNARY_OPS) &&
-                         !in_array($settings[static::SIMPLE_OPERATOR],
-                                static::$_NOBIND_OPS)) {
+                        static::$_UNARY_OPS) && !in_array(
+                        $settings[static::SIMPLE_OPERATOR], static::$_NOBIND_OPS)) {
                     $result[$alias . $counter] = $settings[static::SIMPLE_VALUE];
                 }
 
@@ -334,9 +372,10 @@ abstract class AbstractQueryWhere implements QueryWhere {
                     $settings[static::SIMPLE_OPERATOR]);
         }
 
-        if (in_array($settings[static::SIMPLE_OPERATOR], static::$_ARRAY_OPS)) {
-            return sprintf(':%s %s (%s)', $paramName,
-                    $settings[static::SIMPLE_OPERATOR], $sqlForm);
+        if (!is_null($settings[static::SIMPLE_ARRAY_SUFFIX])) {
+            return sprintf(':%s %s %s (%s)', $paramName,
+                    $settings[static::SIMPLE_OPERATOR],
+                    $settings[static::SIMPLE_ARRAY_SUFFIX], $sqlForm);
         }
 
         if (is_array($settings[static::SIMPLE_VALUE]) && in_array(
