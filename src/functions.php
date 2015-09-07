@@ -286,3 +286,18 @@ function parse_url_smart ($url, array $components) {
 function sortArrayKeysByOther (array $source, array $order) {
     return array_merge(array_flip(array_values($order)), $source);
 }
+
+/**
+ * Trim variable value only if it's string type.
+ *
+ * @param mixed $var
+ * @param null|string $charlist
+ * @return mixed
+ */
+function trim_typesafe ($var, $charlist = null) {
+    if (!is_string($var)) {
+        return $var;
+    }
+
+    return trim($var, $charlist);
+}
