@@ -291,10 +291,10 @@ function sortArrayKeysByOther (array $source, array $order) {
  * Trim variable value only if it's string type.
  *
  * @param mixed $var
- * @param null|string $charlist
+ * @param string $charlist
  * @return mixed
  */
-function trim_typesafe ($var, $charlist = null) {
+function trim_typesafe ($var, $charlist = " \t\n\r\0\x0B") {
     if (!is_string($var)) {
         return $var;
     }
