@@ -324,11 +324,12 @@ function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
                         $value = $nullAs;
                     } elseif (is_bool($value)) {
                         $value = $value ? 't' : 'f';
+                    } elseif (is_string($value)) {
+                        $value = str_replace($delimiter, ' ', $value);
+                        $value = str_replace('\\', '\\\\', $value);
+                        // Convert multiline text to one line.
+                        $value = addcslashes($value, "\0..\37");
                     }
-
-                    $value = str_replace($delimiter, ' ', $value);
-                    // Convert multiline text to one line.
-                    $value = addcslashes($value, "\0..\37");
 
                     return $value;
                 }, $fields);
