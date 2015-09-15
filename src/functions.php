@@ -304,6 +304,24 @@ function trim_typesafe ($var, $charlist = " \t\n\r\0\x0B") {
 
 /**
  *
+ * @link http://php.net/manual/ru/function.str-split.php#115703
+ * @param string $string
+ * @param integer $split_length
+ * @return string[]|false
+ */
+function str_split_unicode ($string, $split_length = 1) {
+    $split_length = intval($split_length);
+
+    if ($split_length < 1) {
+        return false;
+    }
+
+    return preg_split('/(.{' . $split_length . '})/us', $string, -1,
+            PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+}
+
+/**
+ *
  * @param PDO $db
  * @param string $tableName
  * @param string[] $fields List of fields names.
@@ -311,13 +329,14 @@ function trim_typesafe ($var, $charlist = " \t\n\r\0\x0B") {
  * @return boolean
  */
 function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
-    static $delimiter = "\t", $nullAs = '\\N';
+    static $delimiter = "\t", $nullAs = '\N';
+    $escapingChars = "{$delimiter}\n\r\\";
 
     $rows = [];
 
     foreach ($records as $record) {
         $record = array_map(
-                function  ($field) use( $record, $delimiter, $nullAs) {
+                function  ($field) use( $record, $delimiter, $nullAs, $escapingChars) {
                     $value = array_key_exists($field, $record) ? $record[$field] : null;
 
                     if (is_null($value)) {
@@ -325,10 +344,7 @@ function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
                     } elseif (is_bool($value)) {
                         $value = $value ? 't' : 'f';
                     } elseif (is_string($value)) {
-                        $value = str_replace($delimiter, ' ', $value);
-                        $value = str_replace('\\', '\\\\', $value);
-                        // Convert multiline text to one line.
-                        $value = addcslashes($value, "\0..\37");
+                        $value = addcslashes($value, $escapingChars);
                     }
 
                     return $value;
