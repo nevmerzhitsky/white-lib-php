@@ -378,12 +378,12 @@ abstract class AbstractQueryWhere implements QueryWhere {
                     $settings[static::SIMPLE_ARRAY_SUFFIX], $sqlForm);
         }
 
-        if (is_array($settings[static::SIMPLE_VALUE]) && in_array(
-                $settings[static::SIMPLE_OPERATOR],
-                [
-                    static::OP_IN,
-                    static::OP_NIN
-                ])) {
+        if (in_array($settings[static::SIMPLE_OPERATOR], static::$_NOBIND_OPS)) {
+            if (!is_array($settings[static::SIMPLE_VALUE])) {
+                throw new ApplicationException(
+                        "Argument for '{$sqlForm}' ({$paramName}) should be array");
+            }
+
             return sprintf('%s %s (%s)', $sqlForm,
                     $settings[static::SIMPLE_OPERATOR],
                     implode(',', quote_array($settings[static::SIMPLE_VALUE])));
