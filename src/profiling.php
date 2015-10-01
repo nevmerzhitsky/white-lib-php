@@ -15,7 +15,7 @@ trait ExecutionTimes {
     /**
      *
      * @return float[]
-    */
+     */
     public function getExecutionTimes () {
         return $this->_executionTimes;
     }
@@ -31,7 +31,9 @@ trait ExecutionTimes {
     public function getPrintableExecutionTimes () {
         $result = [];
 
-        $result[] = sprintf('total: %.04f', $this->getTotalExecutionTime());
+        if (count($this->_executionTimes) > 1) {
+            $result[] = sprintf('total: %.04f', $this->getTotalExecutionTime());
+        }
 
         foreach ($this->_executionTimes as $name => $value) {
             if (is_float($value)) {
