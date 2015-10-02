@@ -17,7 +17,7 @@ fi
 cd $START_PWD
 START_PWD=`pwd`/
 
-for d in `find -type d | grep vendor/white-lib-php$`
+for d in `find -type d | grep vendor/white-lib-php$ | sort`
 do
     cd $START_PWD$d
     echo -e '###' '\033[37;1m'`pwd`'\033[0m'\$ $CMD
