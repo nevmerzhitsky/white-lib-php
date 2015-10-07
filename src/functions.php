@@ -187,6 +187,52 @@ function quote_array (array $data) {
     ], $data);
 }
 
+/**
+ *
+ * @param scalar[] $values
+ * @param \PDO $db If null then getDb() will called.
+ * @return [scalar[], boolean] Quoted strings; boolean flag of NULL existance.
+ */
+function db_quote_array (array $values, \PDO $db = null) {
+    if (is_null($db)) {
+        $db = getDb();
+    }
+
+    $result = $values;
+    $result = array_map(
+        function  ($v) use( $db) {
+            return !is_null($v) ? $db->quote($v) : null;
+        }, $result);
+    $result = array_filter($result);
+    $nullExists = count($values) != count($result);
+
+    return [
+        $result,
+        $nullExists
+    ];
+}
+
+/**
+ *
+ * @param string $field SQL-condition of field name.
+ * @param array $data List of strings.
+ * @param \PDO $db If null then getDb() will called.
+ * @return string SQL-condition for WHERE.
+ */
+function db_in_or_null_condition ($field, array $data, \PDO $db = null) {
+    list ($quoted, $nullExists) = db_quote_array($data, $db);
+
+    $sqlConds = [];
+    if ($nullExists) {
+        $sqlConds[] = "{$field} IS NULL";
+    }
+    if (count($quoted) - intval($nullExists) > 0) {
+        $sqlConds[] = sprintf("{$field} IN (%s)", implode(',', $quoted));
+    }
+
+    return !empty($sqlConds) ? '(' . implode(' OR ', $sqlConds) . ')' : 'true';
+}
+
 const PHP_URL_FULL_HOST = -1;
 
 const PHP_URL_FULL_HOST_WITHOUT_SCHEME = -2;
