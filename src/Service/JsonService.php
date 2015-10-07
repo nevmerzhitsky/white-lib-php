@@ -28,7 +28,7 @@ class JsonService {
     private $_jsonEncodeOptions = null;
 
     public function __construct ($autoEchoResponse = true, $gzipResponse = true,
-            $jsonEncodeOptions = null) {
+        $jsonEncodeOptions = null) {
         $this->_autoEchoResponse = !empty($autoEchoResponse);
         $this->_gzipResponse = !empty($gzipResponse);
         $this->setJsonEncodeOptions($jsonEncodeOptions);
@@ -92,7 +92,7 @@ class JsonService {
 
         // Wrap for JSONP response.
         if ($this->_supportJsonp && !empty($_REQUEST['callback']) &&
-                 preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
+             preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
             $result = "{$_REQUEST['callback']}({$result})";
         }
 
@@ -100,7 +100,8 @@ class JsonService {
             header('Content-type: application/json; charset=utf-8');
             if (\Config::isDevEnv()) {
                 header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+                header(
+                    'Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
                 header('Access-Control-Allow-Headers: Authorization');
             }
 

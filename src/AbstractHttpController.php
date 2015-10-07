@@ -38,7 +38,8 @@ class AbstractHttpController {
         }
 
         if (!method_exists($this, $actionMethodName)) {
-            throw new HttpControllerException('No released handler for this action', 400);
+            throw new HttpControllerException(
+                'No released handler for this action', 400);
         }
 
         if (!$this->_prepareActionParams($action)) {
@@ -46,10 +47,10 @@ class AbstractHttpController {
         }
 
         return call_user_func(
-                [
-                    $this,
-                    $actionMethodName
-                ]);
+            [
+                $this,
+                $actionMethodName
+            ]);
     }
 
     /**
@@ -93,7 +94,7 @@ class AbstractHttpController {
         }
 
         throw new HttpControllerException(
-                'Unsupported HTTP method for this action', 405);
+            'Unsupported HTTP method for this action', 405);
     }
 
     /**
@@ -127,7 +128,7 @@ class AbstractHttpController {
 
             if (empty($this->_post) || empty($this->_json)) {
                 throw new HttpControllerException(
-                        'Unable to parse JSON in request body', 400);
+                    'Unable to parse JSON in request body', 400);
             }
         }
 
@@ -188,7 +189,7 @@ class AbstractHttpController {
         }
 
         file_put_contents($logPath,
-                sprintf('[%s] %s %s' . PHP_EOL, date('Y-m-d H:i:s'),
-                        $_SERVER['REQUEST_URI'], $this->_post), FILE_APPEND);
+            sprintf('[%s] %s %s' . PHP_EOL, date('Y-m-d H:i:s'),
+                $_SERVER['REQUEST_URI'], $this->_post), FILE_APPEND);
     }
 }

@@ -85,7 +85,7 @@ interface QueryWhere {
     function addField ($alias, $sqlForm = null);
 
     function addSimpleCondition ($field, $value, $operator = self::OP_EQ,
-            $arraySuffix = null);
+        $arraySuffix = null);
 
     function clearAllConditions ();
 
@@ -216,9 +216,9 @@ abstract class AbstractQueryWhere implements QueryWhere {
         }
 
         if (array_key_exists($alias, $this->_fields) &&
-                 $this->_fields[$alias] != $sqlForm) {
+             $this->_fields[$alias] != $sqlForm) {
             throw new ApplicationException(
-                    "You have collision for QueryWhere field '{$alias}'");
+                "You have collision for QueryWhere field '{$alias}'");
         }
 
         $this->_fields[$alias] = $sqlForm;
@@ -229,14 +229,14 @@ abstract class AbstractQueryWhere implements QueryWhere {
     }
 
     public function addSimpleCondition ($field, $value, $operator = self::OP_EQ,
-            $arraySuffix = null) {
+        $arraySuffix = null) {
         if (!in_array($operator, static::getAvailableOperators())) {
             throw new ApplicationException("Unknown operator '{$operator}'");
         }
         if (!is_null($arraySuffix) &&
-                 !in_array($arraySuffix, static::getAvailableArraySuffixes())) {
+             !in_array($arraySuffix, static::getAvailableArraySuffixes())) {
             throw new ApplicationException(
-                    "Unknown array suffix '{$arraySuffix}'");
+                "Unknown array suffix '{$arraySuffix}'");
         }
         if (!array_key_exists($field, $this->_simpleConditions)) {
             throw new ApplicationException("Not inited field '{$field}'");
@@ -257,7 +257,7 @@ abstract class AbstractQueryWhere implements QueryWhere {
     public function addConditions (AbstractQueryWhere $qw) {
         if (in_array($qw, $this->_conditions)) {
             throw new ApplicationException(
-                    "This QueryWhere object already added to conditions list!");
+                "This QueryWhere object already added to conditions list!");
         }
 
         $this->_conditions[] = $qw;
@@ -304,7 +304,7 @@ abstract class AbstractQueryWhere implements QueryWhere {
         foreach ($this->_simpleConditions as $alias => $values) {
             foreach ($values as $settings) {
                 $result[] = $this->_valueToWhere($this->_fields[$alias],
-                        $alias . $counter++, $settings);
+                    $alias . $counter++, $settings);
             }
         }
 
@@ -331,14 +331,15 @@ abstract class AbstractQueryWhere implements QueryWhere {
                 if (static::OP_BETWEEN == $settings[static::SIMPLE_OPERATOR]) {
                     if (count($settings[static::SIMPLE_VALUE]) != 2) {
                         throw new ApplicationException(
-                                'Value for BETWEEN operator should be array of two elements');
+                            'Value for BETWEEN operator should be array of two elements');
                     }
 
                     $result[$alias . $counter . '_from'] = $settings[static::SIMPLE_VALUE][0];
                     $result[$alias . $counter . '_to'] = $settings[static::SIMPLE_VALUE][1];
                 } elseif (!in_array($settings[static::SIMPLE_OPERATOR],
-                        static::$_UNARY_OPS) && !in_array(
-                        $settings[static::SIMPLE_OPERATOR], static::$_NOBIND_OPS)) {
+                    static::$_UNARY_OPS) &&
+                     !in_array($settings[static::SIMPLE_OPERATOR],
+                        static::$_NOBIND_OPS)) {
                     $result[$alias . $counter] = $settings[static::SIMPLE_VALUE];
                 }
 
@@ -369,36 +370,36 @@ abstract class AbstractQueryWhere implements QueryWhere {
     protected function _valueToWhere ($sqlForm, $paramName, array $settings) {
         if (in_array($settings[static::SIMPLE_OPERATOR], static::$_UNARY_OPS)) {
             return sprintf('%s %s', $sqlForm,
-                    $settings[static::SIMPLE_OPERATOR]);
+                $settings[static::SIMPLE_OPERATOR]);
         }
 
         if (!is_null($settings[static::SIMPLE_ARRAY_SUFFIX])) {
             return sprintf(':%s %s %s (%s)', $paramName,
-                    $settings[static::SIMPLE_OPERATOR],
-                    $settings[static::SIMPLE_ARRAY_SUFFIX], $sqlForm);
+                $settings[static::SIMPLE_OPERATOR],
+                $settings[static::SIMPLE_ARRAY_SUFFIX], $sqlForm);
         }
 
         if (in_array($settings[static::SIMPLE_OPERATOR], static::$_NOBIND_OPS)) {
             if (!is_array($settings[static::SIMPLE_VALUE])) {
                 throw new ApplicationException(
-                        "Argument for '{$sqlForm}' ({$paramName}) should be array");
+                    "Argument for '{$sqlForm}' ({$paramName}) should be array");
             }
 
             return sprintf('%s %s (%s)', $sqlForm,
-                    $settings[static::SIMPLE_OPERATOR],
-                    implode(',', quote_array($settings[static::SIMPLE_VALUE])));
+                $settings[static::SIMPLE_OPERATOR],
+                implode(',', quote_array($settings[static::SIMPLE_VALUE])));
         }
 
         if (in_array($settings[static::SIMPLE_OPERATOR],
-                [
-                    static::OP_BETWEEN
-                ])) {
+            [
+                static::OP_BETWEEN
+            ])) {
             return sprintf('%s %s :%3$s_from AND :%3$s_to', $sqlForm,
-                    $settings[static::SIMPLE_OPERATOR], $paramName);
+                $settings[static::SIMPLE_OPERATOR], $paramName);
         }
 
         return sprintf('%s %s (:%s)', $sqlForm,
-                $settings[static::SIMPLE_OPERATOR], $paramName);
+            $settings[static::SIMPLE_OPERATOR], $paramName);
     }
 }
 

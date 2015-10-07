@@ -60,7 +60,7 @@ class Navbar {
      * @return string|null
      */
     public function getIndexUrn () {
-        if (! count($this->getElements())) {
+        if (!count($this->getElements())) {
             return null;
         }
 
@@ -107,7 +107,7 @@ class Navbar {
             if ($navElement['active']) {
                 $liClasses .= ' active';
             }
-            if (! empty($navElement['subelements'])) {
+            if (!empty($navElement['subelements'])) {
                 $liClasses .= ' dropdown';
                 $aClasses .= ' dropdown-toggle';
                 $dropDownAttrs = ' data-toggle="dropdown" role="button" aria-expanded="false"';
@@ -121,7 +121,7 @@ class Navbar {
                     </a>
 HTML;
 
-            if (! empty($navElement['subelements'])) {
+            if (!empty($navElement['subelements'])) {
                 $html[] = '<ul class="dropdown-menu inverse-dropdown" role="menu">';
 
                 foreach ($navElement['subelements'] as $navSubElement) {
