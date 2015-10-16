@@ -62,16 +62,16 @@ class JsonService {
         }
 
         if (!is_callable($handlerFunc)) {
-            throw new \ApplicationException('handlerFunc should be callable');
+            throw new \ApplicationException(
+                'Handler function should be callable');
         }
         if (!is_callable($exceptionParser)) {
-            throw new \ApplicationException('exceptionParser should be callable');
+            throw new \ApplicationException(
+                'Exception parser should be callable');
         }
 
-        if ($this->_autoEchoResponse) {
-            if ($this->_gzipResponse) {
-                ob_start('ob_gzhandler');
-            }
+        if ($this->_autoEchoResponse && $this->_gzipResponse) {
+            ob_start('ob_gzhandler');
         }
 
         try {
