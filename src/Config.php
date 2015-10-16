@@ -31,7 +31,7 @@ class Config {
     static public function initFromFile ($configPath, $section = null) {
         if (!file_exists($configPath)) {
             throw new ApplicationException(
-                    "Config file '{$configPath}' does not exists");
+                "Config file '{$configPath}' does not exists");
         }
 
         if (is_null($section)) {
@@ -44,7 +44,7 @@ class Config {
 
         if (!is_array($fileData)) {
             throw new ApplicationException(
-                    "Some error while parsing config '{$section}'");
+                "Some error while parsing config '{$section}'");
         }
 
         static::$_data[$section] = $fileData;
@@ -70,7 +70,7 @@ class Config {
             }
 
             throw new ApplicationException(
-                    "Config does not have '{$section}' section");
+                "Config does not have '{$section}' section");
         }
 
         if (!array_key_exists($option, static::$_data[$section])) {
@@ -79,7 +79,7 @@ class Config {
             }
 
             throw new ApplicationException(
-                    "Config does not have '{$section}.{$option}' option");
+                "Config does not have '{$section}.{$option}' option");
         }
 
         return static::$_data[$section][$option];
@@ -96,10 +96,10 @@ class Config {
         array_unshift($arguments, $name);
 
         return call_user_func_array(
-                [
-                    'static',
-                    'get'
-                ], $arguments);
+            [
+                'static',
+                'get'
+            ], $arguments);
     }
 
     /**
@@ -118,7 +118,7 @@ class Config {
         // Stupid check a path is absolute. For Linux only.
         if ('/' !== substr($result, 0, 1)) {
             $result = dirname(static::$_pathes[$section]) . DIRECTORY_SEPARATOR .
-                     $result;
+                 $result;
         }
 
         return $result;

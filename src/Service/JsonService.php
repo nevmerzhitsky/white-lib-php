@@ -28,7 +28,7 @@ class JsonService {
     private $_jsonEncodeOptions = null;
 
     public function __construct ($autoEchoResponse = true, $gzipResponse = true,
-            $jsonEncodeOptions = null) {
+        $jsonEncodeOptions = null) {
         $this->_autoEchoResponse = !empty($autoEchoResponse);
         $this->_gzipResponse = !empty($gzipResponse);
         $this->setJsonEncodeOptions($jsonEncodeOptions);
@@ -62,16 +62,16 @@ class JsonService {
         }
 
         if (!is_callable($handlerFunc)) {
-            throw new \ApplicationException('handlerFunc should be callable');
+            throw new \ApplicationException(
+                'Handler function should be callable');
         }
         if (!is_callable($exceptionParser)) {
-            throw new \ApplicationException('exceptionParser should be callable');
+            throw new \ApplicationException(
+                'Exception parser should be callable');
         }
 
-        if ($this->_autoEchoResponse) {
-            if ($this->_gzipResponse) {
-                ob_start('ob_gzhandler');
-            }
+        if ($this->_autoEchoResponse && $this->_gzipResponse) {
+            ob_start('ob_gzhandler');
         }
 
         try {
@@ -92,7 +92,7 @@ class JsonService {
 
         // Wrap for JSONP response.
         if ($this->_supportJsonp && !empty($_REQUEST['callback']) &&
-                 preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
+             preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
             $result = "{$_REQUEST['callback']}({$result})";
         }
 
@@ -100,7 +100,8 @@ class JsonService {
             header('Content-type: application/json; charset=utf-8');
             if (\Config::isDevEnv()) {
                 header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+                header(
+                    'Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
                 header('Access-Control-Allow-Headers: Authorization');
             }
 

@@ -97,7 +97,7 @@ class Pagination {
         $first = $pageNumber - $neighbors;
         $first = max($first, 1);
         $last = $pageNumber + $neighbors +
-                 abs(min($pageNumber - $neighbors - 1, 0));
+             abs(min($pageNumber - $neighbors - 1, 0));
         $last = min($last, $this->_totalPages);
         $last = max($last, $first);
 
@@ -175,7 +175,8 @@ HTML;
      * @param boolean $alwaysEdges
      * @return array
      */
-    public function getNavForJson ($pageNumber, $neighbors = 3, $alwaysEdges = true) {
+    public function getNavForJson ($pageNumber, $neighbors = 3,
+        $alwaysEdges = true) {
         $nav = $this->getNav($pageNumber, $neighbors, $alwaysEdges);
 
         return [

@@ -41,7 +41,7 @@ if (!function_exists('array_column')) {
  */
 function di_to_seconds (DateInterval $di) {
     return ($di->days * 24 * 60 * 60) + ($di->h * 60 * 60) + ($di->i * 60) +
-             $di->s;
+         $di->s;
 }
 
 /**
@@ -54,7 +54,7 @@ function di_to_seconds (DateInterval $di) {
  *       http://www.slideshare.net/ustimenko-alexander/nested-set?ref=http://www.slideshare.net/slideshow/embed_code/15338507
  */
 function enumerate_nested_array (array $data, $childrenName, &$counter = null,
-        $level = 1) {
+    $level = 1) {
     $result = [];
 
     if (is_null($counter)) {
@@ -63,7 +63,7 @@ function enumerate_nested_array (array $data, $childrenName, &$counter = null,
 
     foreach ($data as $node) {
         if (is_array($node) && array_key_exists($childrenName, $node) &&
-                 is_array($node[$childrenName])) {
+             is_array($node[$childrenName])) {
             $children = $node[$childrenName];
         } else {
             $children = [];
@@ -74,7 +74,7 @@ function enumerate_nested_array (array $data, $childrenName, &$counter = null,
         $temp = $node;
         $temp['ns_lft'] = ++$counter;
         $newresult = enumerate_nested_array($children, $childrenName, $counter,
-                $level + 1);
+            $level + 1);
         $temp['ns_rgt'] = ++$counter;
         $temp['ns_lvl'] = $level;
 
@@ -104,11 +104,11 @@ function is_base64_string ($data) {
  */
 function from_camel_case ($input) {
     preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!',
-            $input, $matches);
+        $input, $matches);
     $ret = $matches[0];
     foreach ($ret as &$match) {
         $match = $match == strtoupper($match) ? strtolower($match) : lcfirst(
-                $match);
+            $match);
     }
     return implode('_', $ret);
 }
@@ -159,14 +159,14 @@ function join_arrays () {
             foreach ($loopArray as $value) {
                 if (!is_numeric($key)) {
                     $result[] = array_merge($prevResultRow,
-                            [
-                                $key => $value
-                            ]);
+                        [
+                            $key => $value
+                        ]);
                 } else {
                     $result[] = array_merge($prevResultRow,
-                            [
-                                $value
-                            ]);
+                        [
+                            $value
+                        ]);
                 }
             }
         }
@@ -182,10 +182,10 @@ function join_arrays () {
  */
 function quote_array (array $data) {
     return array_map(
-            [
-                getDb(),
-                'quote'
-            ], $data);
+        [
+            getDb(),
+            'quote'
+        ], $data);
 }
 
 const PHP_URL_FULL_HOST = -1;
@@ -233,11 +233,11 @@ function parse_url_smart ($url, array $components) {
 
             $result[$component] = $value;
         } elseif (PHP_URL_FULL_HOST == $component ||
-                 PHP_URL_FULL_HOST_WITHOUT_SCHEME == $component) {
+             PHP_URL_FULL_HOST_WITHOUT_SCHEME == $component) {
             $value = [];
 
             if (PHP_URL_FULL_HOST == $component &&
-                     array_key_exists('scheme', $parts)) {
+                 array_key_exists('scheme', $parts)) {
                 $value[] = "{$parts['scheme']}://";
             }
             if (array_key_exists('user', $parts)) {
@@ -317,7 +317,7 @@ function str_split_unicode ($string, $split_length = 1) {
     }
 
     return preg_split('/(.{' . $split_length . '})/us', $string, -1,
-            PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 }
 
 /**
@@ -336,22 +336,22 @@ function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
 
     foreach ($records as $record) {
         $record = array_map(
-                function  ($field) use( $record, $delimiter, $nullAs, $escapingChars) {
-                    $value = array_key_exists($field, $record) ? $record[$field] : null;
+            function  ($field) use( $record, $delimiter, $nullAs, $escapingChars) {
+                $value = array_key_exists($field, $record) ? $record[$field] : null;
 
-                    if (is_null($value)) {
-                        $value = $nullAs;
-                    } elseif (is_bool($value)) {
-                        $value = $value ? 't' : 'f';
-                    } elseif (is_string($value)) {
-                        $value = addcslashes($value, $escapingChars);
-                    }
+                if (is_null($value)) {
+                    $value = $nullAs;
+                } elseif (is_bool($value)) {
+                    $value = $value ? 't' : 'f';
+                } elseif (is_string($value)) {
+                    $value = addcslashes($value, $escapingChars);
+                }
 
-                    return $value;
-                }, $fields);
+                return $value;
+            }, $fields);
         $rows[] = implode($delimiter, $record) . "\n";
     }
 
     return $db->pgsqlCopyFromArray($tableName, $rows, $delimiter,
-            addslashes($nullAs), implode(',', $fields));
+        addslashes($nullAs), implode(',', $fields));
 }
