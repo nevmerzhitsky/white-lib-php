@@ -28,22 +28,36 @@ class AbstractHttpController {
     /**
      *
      * @param string $action
-     * @return void|mixed
+     * @return mixed|null
      */
     public function doAction ($action) {
+        $result = $this->_reallyDoAction($action);
+
+        $this->_saveProfilingInfo();
+
+        return $result;
+    }
+
+    /**
+     *
+     * @param string $action
+     * @return mixed|null
+     */
+    private function _reallyDoAction ($action) {
         $actionMethodName = $this->_addHttpMethod($action);
 
         if (!$actionMethodName) {
-            return;
+            return null;
         }
 
+        // @TODO: Use Reflection to check accessability to call a method.
         if (!method_exists($this, $actionMethodName)) {
             throw new HttpControllerException(
                 'No released handler for this action', 400);
         }
 
         if (!$this->_prepareActionParams($action)) {
-            return;
+            return null;
         }
 
         return call_user_func(
@@ -191,5 +205,23 @@ class AbstractHttpController {
         file_put_contents($logPath,
             sprintf('[%s] %s %s' . PHP_EOL, date('Y-m-d H:i:s'),
                 $_SERVER['REQUEST_URI'], $this->_post), FILE_APPEND);
+    }
+
+    private function _saveProfilingInfo () {
+        if (!Config::isDebugProfilingEnabled()) {
+            return;
+        }
+
+        $dist = Config::app('profile_output', 'php://output');
+
+        if (!is_writable($dist)) {
+            return;
+        }
+
+        if (in_array('ExecutionTimes', class_uses($this))) {
+            $data = sprintf('[%s time profile] %s' . PHP_EOL, get_class($this),
+                implode(', ', $this->getPrintableExecutionTimes()));
+            file_put_contents($dist, $data, FILE_APPEND);
+        }
     }
 }

@@ -40,6 +40,7 @@ class Config {
 
         static::$_pathes[$section] = realpath($configPath);
 
+        // @TODO First read a file with default values of options.
         $fileData = parse_ini_file($configPath, false, INI_SCANNER_NORMAL);
 
         if (!is_array($fileData)) {
@@ -149,6 +150,10 @@ class Config {
      * @return boolean
      */
     static public function isDebugProfilingEnabled () {
+        if (static::app('profile_always', 0)) {
+            return true;
+        }
+
         return static::isDevEnv() && !empty($_REQUEST['debug_profile']);
     }
 
