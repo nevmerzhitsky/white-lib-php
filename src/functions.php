@@ -214,6 +214,51 @@ function db_quote_array (array $values, \PDO $db = null) {
 
 /**
  *
+ * @param string[] $names
+ */
+function db_quote_names (array $names) {
+    return array_map(function  ($f) {
+        return "\"{$f}\"";
+    }, $names);
+}
+
+/**
+ *
+ * @param string[] $names
+ */
+function db_create_placeholders (array $names) {
+    return array_map(function  ($f) {
+        return ":{$f}";
+    }, $names);
+}
+
+/**
+ *
+ * @param string[] $fields
+ * @param string[] $placeholders
+ * @param boolean $fieldsPrepared
+ * @param boolean $placeholdersPrepared
+ * @return string
+ */
+function db_update_set (array $fields, array $placeholders,
+    $fieldsPrepared = true, $placeholdersPrepared = true) {
+    if (empty($fieldsPrepared)) {
+        $fields = db_quote_names($fields);
+    }
+    if (empty($placeholdersPrepared)) {
+        $placeholders = db_create_placeholders($placeholders);
+    }
+
+    $result = array_map(
+        function  ($f, $p) {
+            return "{$f} = {$p}";
+        }, $fields, $placeholders);
+
+    return implode(', ', $result);
+}
+
+/**
+ *
  * @param string $field SQL-condition of field name.
  * @param array $data List of strings.
  * @param \PDO $db If null then getDb() will called.
