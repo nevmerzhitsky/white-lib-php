@@ -90,14 +90,17 @@ class JsonService {
             return null;
         }
 
+        $contentSubType = 'json';
+
         // Wrap for JSONP response.
         if ($this->_supportJsonp && !empty($_REQUEST['callback']) &&
              preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
             $result = "{$_REQUEST['callback']}({$result})";
+            $contentSubType = 'javascript';
         }
 
         if ($this->_autoEchoResponse) {
-            header('Content-type: application/json; charset=utf-8');
+            header("Content-type: application/{$contentSubType}; charset=utf-8");
             if (\Config::isDevEnv()) {
                 header('Access-Control-Allow-Origin: *');
                 header(
