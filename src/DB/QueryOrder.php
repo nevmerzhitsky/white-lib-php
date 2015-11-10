@@ -68,11 +68,22 @@ class QueryOrder {
         $this->_order = [];
 
         foreach ($conditions as $alias => $sqlForm) {
-            if (is_numeric($alias)) {
-                $this->addCondition($sqlForm);
+            if (is_array($sqlForm)) {
+                if (count($sqlForm) != 2) {
+                    throw new ApplicationException(
+                        'Condition of QueryOrder in array-form should have exact two values');
+                }
+
+                list ($sqlForm, $direction) = $sqlForm;
             } else {
-                $this->addCondition($alias, $sqlForm);
+                $direction = self::DEFAULT_DIR;
             }
+
+            if (is_numeric($alias)) {
+                $alias = $sqlForm;
+            }
+
+            $this->addCondition($alias, $sqlForm, $direction);
         }
     }
 
