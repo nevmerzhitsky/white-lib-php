@@ -121,6 +121,12 @@ class QueryOrder {
         return $this->_order;
     }
 
+    /**
+     * Set order of condition in ORDER BY clause.
+     *
+     * @param array $aliases
+     * @param string $updateDefault If {true} then default order will updated.
+     */
     public function setOrder (array $aliases, $updateDefault = false) {
         $this->_checkAliasesExists($aliases);
 
@@ -131,7 +137,19 @@ class QueryOrder {
         }
     }
 
-    public function raiseConditionsInOrder (array $aliases) {
+    /**
+     * Move some conditions to the top of order.
+     *
+     * @param string[]|string $aliases Condition aliases array or one condition
+     *        alias.
+     */
+    public function raiseConditionsInOrder ($aliases) {
+        if (!is_array($aliases)) {
+            $aliases = [
+                $aliases
+            ];
+        }
+
         $this->_checkAliasesExists($aliases);
 
         $order = $aliases;
