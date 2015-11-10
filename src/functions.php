@@ -225,11 +225,20 @@ function db_quote_names (array $names) {
 /**
  *
  * @param string[] $names
+ * @param string[] $casts Map field name to casting type. [name => TEXT] for
+ *        example.
  */
-function db_create_placeholders (array $names) {
-    return array_map(function  ($f) {
-        return ":{$f}";
-    }, $names);
+function db_create_placeholders (array $names, array $casts = []) {
+    return array_map(
+        function  ($f) use( $casts) {
+            $result = ":{$f}";
+
+            if (array_key_exists($f, $casts)) {
+                $result .= "::{$casts[$f]}";
+            }
+
+            return $result;
+        }, $names);
 }
 
 /**
