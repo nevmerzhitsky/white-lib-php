@@ -5,6 +5,10 @@
  */
 class QueryOrder {
 
+    const _STRUCT_SQL = 'sql_cond';
+
+    const _STRUCT_DIRECTION = 'direction';
+
     const DIR_ASC = 'ASC';
 
     const DIR_DESC = 'DESC';
@@ -26,69 +30,82 @@ class QueryOrder {
      *
      * @var string[]
      */
-    protected $_fields = [];
+    protected $_conditions = [];
 
     /**
      *
-     * @var scalar[]
+     * @var string[]
      */
-    protected $_conditions = [];
+    protected $_order = [];
 
-    public function __construct (array $fields = []) {
-        $this->clear();
-        $this->addFields($fields);
+    public function __construct (array $conditions = []) {
+        $this->addConditions($conditions);
     }
 
-    public function addFields (array $fields) {
-        $this->_fields = [];
+    public function addConditions (array $conditions) {
+        $this->_conditions = [];
+        $this->_order = [];
 
-        foreach ($fields as $alias => $sqlForm) {
+        foreach ($conditions as $alias => $sqlForm) {
             if (is_numeric($alias)) {
-                $this->addField($sqlForm);
+                $this->addCondition($sqlForm);
             } else {
-                $this->addField($alias, $sqlForm);
+                $this->addCondition($alias, $sqlForm);
             }
         }
     }
 
-    public function addField ($alias, $sqlForm = null) {
+    public function addCondition ($alias, $sqlForm = null,
+        $direction = self::DEFAULT_DIR) {
         if (empty($sqlForm)) {
             $sqlForm = $alias;
         }
 
-        if (array_key_exists($alias, $this->_fields) &&
-             $this->_fields[$alias] != $sqlForm) {
+        if (array_key_exists($alias, $this->_conditions) &&
+             $this->_conditions[$alias][self::_STRUCT_SQL] != $sqlForm) {
             throw new ApplicationException(
-                "You have collision for QueryOrder field '{$alias}'");
+                "You have collision for QueryOrder condition '{$alias}'");
         }
 
-        $this->_fields[$alias] = $sqlForm;
+        $this->_conditions[$alias] = [
+            self::_STRUCT_SQL => $sqlForm,
+            self::_STRUCT_DIRECTION => self::DEFAULT_DIR
+        ];
+        $this->setDirection($alias, $direction);
+
+        $this->_order[] = $alias;
     }
 
-    public function addCondition ($field, $direction = self::DEFAULT_DIR) {
+    public function setDirection ($alias, $direction = self::DEFAULT_DIR) {
+        if (!array_key_exists($alias, $this->_conditions)) {
+            throw new ApplicationException(
+                "Not initialized condition '{$alias}'");
+        }
         if (!in_array($direction, static::getAvailableDirections())) {
             throw new ApplicationException("Unknown direction '{$direction}'");
         }
-        if (!array_key_exists($field, $this->_fields)) {
-            throw new ApplicationException("Not inited field '{$field}'");
-        }
 
-        $this->_conditions[$field] = $direction;
+        $this->_conditions[$alias][self::_STRUCT_DIRECTION] = $direction;
     }
 
-    public function clear () {
-        $this->_conditions = [];
+    public function setOrder (array $aliases) {
+        foreach ($aliases as $alias) {
+            if (!array_key_exists($alias, $this->_conditions)) {
+                throw new ApplicationException(
+                    "Not initialized condition '{$alias}'");
+            }
+        }
+
+        $this->_order = $aliases;
     }
 
     public function getOrderBy () {
         $conds = [];
 
-        foreach ($this->_fields as $alias => $sqlCond) {
-            if (!array_key_exists($alias, $this->_conditions)) {
-                continue;
-            }
-
-            $conds[] = sprintf('%s %s', $sqlCond, $this->_conditions[$alias]);
+        foreach ($this->_order as $alias) {
+            $conds[] = sprintf('%s %s',
+                $this->_conditions[$alias][self::_STRUCT_SQL],
+                $this->_conditions[$alias][self::_STRUCT_DIRECTION]);
         }
 
         if (empty($conds)) {
