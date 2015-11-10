@@ -48,6 +48,21 @@ class QueryOrder {
         $this->addConditions($conditions);
     }
 
+    private function _checkAliasesExists ($aliases) {
+        if (!is_array($aliases)) {
+            $aliases = [
+                $aliases
+            ];
+        }
+
+        foreach ($aliases as $alias) {
+            if (!array_key_exists($alias, $this->_conditions)) {
+                throw new ApplicationException(
+                    "Not initialized condition '{$alias}'");
+            }
+        }
+    }
+
     public function addConditions (array $conditions) {
         $this->_conditions = [];
         $this->_order = [];
@@ -83,10 +98,8 @@ class QueryOrder {
     }
 
     public function setDirection ($alias, $direction = self::DEFAULT_DIR) {
-        if (!array_key_exists($alias, $this->_conditions)) {
-            throw new ApplicationException(
-                "Not initialized condition '{$alias}'");
-        }
+        $this->_checkAliasesExists($alias);
+
         if (!in_array($direction, static::getAvailableDirections())) {
             throw new ApplicationException("Unknown direction '{$direction}'");
         }
@@ -95,12 +108,7 @@ class QueryOrder {
     }
 
     public function setDefaultOrder (array $aliases) {
-        foreach ($aliases as $alias) {
-            if (!array_key_exists($alias, $this->_conditions)) {
-                throw new ApplicationException(
-                    "Not initialized condition '{$alias}'");
-            }
-        }
+        $this->_checkAliasesExists($aliases);
 
         $this->_defaultOrder = $aliases;
     }
@@ -109,19 +117,34 @@ class QueryOrder {
      *
      * @return string[] List of conditions alises.
      */
-    public function getFieldsOrder () {
+    public function getConditionsOrder () {
         return $this->_order;
     }
 
-    public function setOrder (array $aliases) {
-        foreach ($aliases as $alias) {
-            if (!array_key_exists($alias, $this->_conditions)) {
-                throw new ApplicationException(
-                    "Not initialized condition '{$alias}'");
-            }
-        }
+    public function setOrder (array $aliases, $updateDefault = false) {
+        $this->_checkAliasesExists($aliases);
 
         $this->_order = $aliases;
+
+        if (!empty($updateDefault)) {
+            $this->setDefaultOrder($aliases);
+        }
+    }
+
+    public function raiseConditionsInOrder (array $aliases) {
+        $this->_checkAliasesExists($aliases);
+
+        $order = $aliases;
+
+        foreach ($this->getConditionsOrder() as $alias) {
+            if (in_array($alias, $order)) {
+                continue;
+            }
+
+            $order[] = $alias;
+        }
+
+        $this->setOrder($order);
     }
 
     public function resetOrder () {
@@ -135,7 +158,7 @@ class QueryOrder {
     public function getOrderBy () {
         $conds = [];
 
-        foreach ($this->getFieldsOrder() as $alias) {
+        foreach ($this->getConditionsOrder() as $alias) {
             $conds[] = sprintf('%s %s',
                 $this->_conditions[$alias][self::_STRUCT_SQL],
                 $this->_conditions[$alias][self::_STRUCT_DIRECTION]);
