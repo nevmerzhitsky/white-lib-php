@@ -197,6 +197,6 @@ class QueryOrder {
             return '';
         }
 
-        return 'ORDER BY ' . implode(', ', $conds);
+        return 'ORDER BY ' . implode(', ', $conds) .' NULLS LAST';
     }
 }
