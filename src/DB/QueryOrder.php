@@ -36,6 +36,12 @@ class QueryOrder {
      *
      * @var string[]
      */
+    protected $_defaultOrder = [];
+
+    /**
+     *
+     * @var string[]
+     */
     protected $_order = [];
 
     public function __construct (array $conditions = []) {
@@ -88,6 +94,25 @@ class QueryOrder {
         $this->_conditions[$alias][self::_STRUCT_DIRECTION] = $direction;
     }
 
+    public function setDefaultOrder (array $aliases) {
+        foreach ($aliases as $alias) {
+            if (!array_key_exists($alias, $this->_conditions)) {
+                throw new ApplicationException(
+                    "Not initialized condition '{$alias}'");
+            }
+        }
+
+        $this->_defaultOrder = $aliases;
+    }
+
+    /**
+     *
+     * @return string[] List of conditions alises.
+     */
+    public function getFieldsOrder () {
+        return $this->_order;
+    }
+
     public function setOrder (array $aliases) {
         foreach ($aliases as $alias) {
             if (!array_key_exists($alias, $this->_conditions)) {
@@ -99,10 +124,18 @@ class QueryOrder {
         $this->_order = $aliases;
     }
 
+    public function resetOrder () {
+        $this->_order = $this->_defaultOrder;
+    }
+
+    /**
+     *
+     * @return string SQL-clause ORDER BY or empty string.
+     */
     public function getOrderBy () {
         $conds = [];
 
-        foreach ($this->_order as $alias) {
+        foreach ($this->getFieldsOrder() as $alias) {
             $conds[] = sprintf('%s %s',
                 $this->_conditions[$alias][self::_STRUCT_SQL],
                 $this->_conditions[$alias][self::_STRUCT_DIRECTION]);
