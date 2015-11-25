@@ -1,0 +1,27 @@
+{
+    "name": "whitecode/white-lib-php",
+    "description": "General purpose PHP library for web-applications.",
+    "keywords": ["whitecode"],
+    "homepage": "http://whitecode.ru",
+    "authors": [
+        {
+            "name": "Sergey Nevmerzhitsky",
+            "email": "sergey.nevmerzhitsky@gmail.com",
+            "homepage": "http://nevmerzhitsky.ru/",
+            "role": "Creator"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "files": [
+            "src/init.php",
+            "src/DB/QueryOrder.php",
+            "src/DB/QueryWhere.php",
+            "src/functions.php",
+            "src/profiling.php"
+        ],
+        "classmap": ["src/"]
+    }
+}
