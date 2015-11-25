@@ -16,9 +16,9 @@
     },
     "autoload": {
         "files": [
-            "src/init.php",
             "src/functions.php",
-            "src/profiling.php"
+            "src/profiling.php",
+            "src/init.php"
         ],
         "classmap": ["src/"]
     }
