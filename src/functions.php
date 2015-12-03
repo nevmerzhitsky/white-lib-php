@@ -454,3 +454,33 @@ function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
     return $db->pgsqlCopyFromArray($tableName, $rows, $delimiter,
         addslashes($nullAs), implode(',', $fields));
 }
+
+/**
+ *
+ * @param array $result
+ * @param string[] $sortRules Assoc array of "fields name" => ORDER
+ *        (SORT_ASC/SORT_DESC)
+ * @return unknown
+ */
+function sortDbRowset (array &$result, array $sortRules) {
+    if (empty($result)) {
+        return $result;
+    }
+    $fields = array_keys($result[0]);
+    $columns = array_combine($fields, array_fill(0, count($fields), []));
+
+    foreach ($result as $key => $data) {
+        foreach (array_keys($columns) as $field) {
+            $columns[$field][$key] = $data[$field];
+        }
+    }
+
+    $sortParams = [];
+    foreach ($sortRules as $field => $order) {
+        $sortParams[] = $columns[$field];
+        $sortParams[] = $order;
+    }
+    $sortParams[] = &$result;
+
+    call_user_func_array('array_multisort', $sortParams);
+}
