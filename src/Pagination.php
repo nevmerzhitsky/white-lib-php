@@ -74,10 +74,17 @@ class Pagination {
 
     public function getSelectParams ($pageNumber) {
         $temp = $this->getLimitParams($pageNumber);
+
         return [
             'count' => $temp[0],
             'offset' => $temp[1]
         ];
+    }
+
+    public function sliceData (array $data, $pageNumber) {
+        $temp = $this->getLimitParams($pageNumber);
+
+        return array_slice($data, $temp[1], $temp[0]);
     }
 
     /**
