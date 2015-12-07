@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('APPBASE')) {
     define('APPBASE', __DIR__ . '/../../../');
 }

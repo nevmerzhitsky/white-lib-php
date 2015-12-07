@@ -2,7 +2,6 @@
 if (!function_exists('array_column')) {
 
     /**
-     *
      * @param array $array
      * @param mixed $column_key
      * @param mixed $index_key
@@ -35,13 +34,11 @@ if (!function_exists('array_column')) {
 }
 
 /**
- *
  * @param DateInterval $di
  * @return integer
  */
 function di_to_seconds (DateInterval $di) {
-    return ($di->days * 24 * 60 * 60) + ($di->h * 60 * 60) + ($di->i * 60) +
-         $di->s;
+    return ($di->days * 24 * 60 * 60) + ($di->h * 60 * 60) + ($di->i * 60) + $di->s;
 }
 
 /**
@@ -53,8 +50,7 @@ function di_to_seconds (DateInterval $di) {
  * @link
  *       http://www.slideshare.net/ustimenko-alexander/nested-set?ref=http://www.slideshare.net/slideshow/embed_code/15338507
  */
-function enumerate_nested_array (array $data, $childrenName, &$counter = null,
-    $level = 1) {
+function enumerate_nested_array (array $data, $childrenName, &$counter = null, $level = 1) {
     $result = [];
 
     if (is_null($counter)) {
@@ -62,8 +58,8 @@ function enumerate_nested_array (array $data, $childrenName, &$counter = null,
     }
 
     foreach ($data as $node) {
-        if (is_array($node) && array_key_exists($childrenName, $node) &&
-             is_array($node[$childrenName])) {
+        if (is_array($node) && array_key_exists($childrenName, $node) && is_array(
+            $node[$childrenName])) {
             $children = $node[$childrenName];
         } else {
             $children = [];
@@ -73,8 +69,7 @@ function enumerate_nested_array (array $data, $childrenName, &$counter = null,
 
         $temp = $node;
         $temp['ns_lft'] = ++$counter;
-        $newresult = enumerate_nested_array($children, $childrenName, $counter,
-            $level + 1);
+        $newresult = enumerate_nested_array($children, $childrenName, $counter, $level + 1);
         $temp['ns_rgt'] = ++$counter;
         $temp['ns_lvl'] = $level;
 
@@ -86,7 +81,6 @@ function enumerate_nested_array (array $data, $childrenName, &$counter = null,
 }
 
 /**
- *
  * @param string $data
  * @return boolean
  */
@@ -103,20 +97,17 @@ function is_base64_string ($data) {
  * @link http://stackoverflow.com/a/1993772/3155344
  */
 function from_camel_case ($input) {
-    preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!',
-        $input, $matches);
+    preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
     $ret = $matches[0];
     foreach ($ret as &$match) {
-        $match = $match == strtoupper($match) ? strtolower($match) : lcfirst(
-            $match);
+        $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
     }
     return implode('_', $ret);
 }
 
 /**
  * Join all values of given arrays to each other.
- * Produce array in which each
- * row is a vector of points in the all given arrays.
+ * Produce array in which each row is a vector of points in the all given arrays.
  *
  * @param array $arr1
  * @param array ...
@@ -176,7 +167,6 @@ function join_arrays () {
 }
 
 /**
- *
  * @param array $data
  * @return array
  */
@@ -188,7 +178,6 @@ function quote_array (array $data) {
 }
 
 /**
- *
  * @param scalar[] $values
  * @param \PDO $db If null then getDb() will called.
  * @return [scalar[], boolean] Quoted strings; boolean flag of NULL existance.
@@ -213,7 +202,6 @@ function db_quote_array (array $values, \PDO $db = null) {
 }
 
 /**
- *
  * @param string[] $names
  */
 function db_quote_names (array $names) {
@@ -223,10 +211,8 @@ function db_quote_names (array $names) {
 }
 
 /**
- *
  * @param string[] $names
- * @param string[] $casts Map field name to casting type. [name => TEXT] for
- *        example.
+ * @param string[] $casts Map field name to casting type. [name => TEXT] for example.
  */
 function db_create_placeholders (array $names, array $casts = []) {
     return array_map(
@@ -242,15 +228,14 @@ function db_create_placeholders (array $names, array $casts = []) {
 }
 
 /**
- *
  * @param string[] $fields
  * @param string[] $placeholders
  * @param boolean $fieldsPrepared
  * @param boolean $placeholdersPrepared
  * @return string
  */
-function db_update_set (array $fields, array $placeholders,
-    $fieldsPrepared = true, $placeholdersPrepared = true) {
+function db_update_set (array $fields, array $placeholders, $fieldsPrepared = true,
+    $placeholdersPrepared = true) {
     if (empty($fieldsPrepared)) {
         $fields = db_quote_names($fields);
     }
@@ -258,23 +243,21 @@ function db_update_set (array $fields, array $placeholders,
         $placeholders = db_create_placeholders($placeholders);
     }
 
-    $result = array_map(
-        function  ($f, $p) {
-            return "{$f} = {$p}";
-        }, $fields, $placeholders);
+    $result = array_map(function  ($f, $p) {
+        return "{$f} = {$p}";
+    }, $fields, $placeholders);
 
     return implode(', ', $result);
 }
 
 /**
- *
  * @param string $field SQL-condition of field name.
  * @param array $data List of strings.
  * @param \PDO $db If null then getDb() will called.
  * @return string SQL-condition for WHERE.
  */
 function db_in_or_null_condition ($field, array $data, \PDO $db = null) {
-    list ($quoted, $nullExists) = db_quote_array($data, $db);
+    list($quoted, $nullExists) = db_quote_array($data, $db);
 
     $sqlConds = [];
     if ($nullExists) {
@@ -286,11 +269,8 @@ function db_in_or_null_condition ($field, array $data, \PDO $db = null) {
 
     return !empty($sqlConds) ? '(' . implode(' OR ', $sqlConds) . ')' : 'true';
 }
-
 const PHP_URL_FULL_HOST = -1;
-
 const PHP_URL_FULL_HOST_WITHOUT_SCHEME = -2;
-
 const PHP_URL_FULL_PATH = -3;
 
 /**
@@ -331,12 +311,10 @@ function parse_url_smart ($url, array $components) {
             }
 
             $result[$component] = $value;
-        } elseif (PHP_URL_FULL_HOST == $component ||
-             PHP_URL_FULL_HOST_WITHOUT_SCHEME == $component) {
+        } elseif (PHP_URL_FULL_HOST == $component || PHP_URL_FULL_HOST_WITHOUT_SCHEME == $component) {
             $value = [];
 
-            if (PHP_URL_FULL_HOST == $component &&
-                 array_key_exists('scheme', $parts)) {
+            if (PHP_URL_FULL_HOST == $component && array_key_exists('scheme', $parts)) {
                 $value[] = "{$parts['scheme']}://";
             }
             if (array_key_exists('user', $parts)) {
@@ -402,7 +380,6 @@ function trim_typesafe ($var, $charlist = " \t\n\r\0\x0B") {
 }
 
 /**
- *
  * @link http://php.net/manual/ru/function.str-split.php#115703
  * @param string $string
  * @param integer $split_length
@@ -420,7 +397,6 @@ function str_split_unicode ($string, $split_length = 1) {
 }
 
 /**
- *
  * @param PDO $db
  * @param string $tableName
  * @param string[] $fields List of fields names.
@@ -451,15 +427,13 @@ function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
         $rows[] = implode($delimiter, $record) . "\n";
     }
 
-    return $db->pgsqlCopyFromArray($tableName, $rows, $delimiter,
-        addslashes($nullAs), implode(',', $fields));
+    return $db->pgsqlCopyFromArray($tableName, $rows, $delimiter, addslashes($nullAs),
+        implode(',', $fields));
 }
 
 /**
- *
  * @param array $result
- * @param string[] $sortRules Assoc array of "fields name" => ORDER
- *        (SORT_ASC/SORT_DESC)
+ * @param string[] $sortRules Assoc array of "fields name" => ORDER (SORT_ASC/SORT_DESC)
  * @return unknown
  */
 function sortDbRowset (array &$result, array $sortRules) {

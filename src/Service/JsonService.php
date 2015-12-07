@@ -4,38 +4,32 @@ namespace Service;
 class JsonService {
 
     /**
-     *
      * @var boolean
      */
     private $_autoEchoResponse = false;
 
     /**
-     *
      * @var boolean
      */
     private $_gzipResponse = false;
 
     /**
-     *
      * @var boolean
      */
     private $_supportJsonp = true;
 
     /**
-     *
      * @var integer|null
      */
     private $_jsonEncodeOptions = null;
 
-    public function __construct ($autoEchoResponse = true, $gzipResponse = true,
-        $jsonEncodeOptions = null) {
+    public function __construct ($autoEchoResponse = true, $gzipResponse = true, $jsonEncodeOptions = null) {
         $this->_autoEchoResponse = !empty($autoEchoResponse);
         $this->_gzipResponse = !empty($gzipResponse);
         $this->setJsonEncodeOptions($jsonEncodeOptions);
     }
 
     /**
-     *
      * @param integer|null $value
      */
     public function setJsonEncodeOptions ($value) {
@@ -46,7 +40,6 @@ class JsonService {
     }
 
     /**
-     *
      * @param boolean $value
      */
     public function setSupportJsonp ($value) {
@@ -62,12 +55,10 @@ class JsonService {
         }
 
         if (!is_callable($handlerFunc)) {
-            throw new \ApplicationException(
-                'Handler function should be callable');
+            throw new \ApplicationException('Handler function should be callable');
         }
         if (!is_callable($exceptionParser)) {
-            throw new \ApplicationException(
-                'Exception parser should be callable');
+            throw new \ApplicationException('Exception parser should be callable');
         }
 
         if ($this->_autoEchoResponse && $this->_gzipResponse) {
@@ -93,8 +84,8 @@ class JsonService {
         $contentSubType = 'json';
 
         // Wrap for JSONP response.
-        if ($this->_supportJsonp && !empty($_REQUEST['callback']) &&
-             preg_match('%^[\d\w\-_\.]+$%i', $_REQUEST['callback'])) {
+        if ($this->_supportJsonp && !empty($_REQUEST['callback']) && preg_match('%^[\d\w\-_\.]+$%i',
+            $_REQUEST['callback'])) {
             $result = "{$_REQUEST['callback']}({$result})";
             $contentSubType = 'javascript';
         }
@@ -103,8 +94,7 @@ class JsonService {
             header("Content-type: application/{$contentSubType}; charset=utf-8");
             if (\Config::isDevEnv()) {
                 header('Access-Control-Allow-Origin: *');
-                header(
-                    'Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+                header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
                 header('Access-Control-Allow-Headers: Authorization');
             }
 

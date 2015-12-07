@@ -1,7 +1,5 @@
 <?php
-
 const ENV_DEVELOPMENT = 'development';
-
 const ENV_PRODUCTION = 'production';
 
 class Config {
@@ -23,15 +21,13 @@ class Config {
     }
 
     /**
-     *
      * @param string $configPath
      * @param string|null $section
      * @return boolean
      */
     static public function initFromFile ($configPath, $section = null) {
         if (!file_exists($configPath)) {
-            throw new ApplicationException(
-                "Config file '{$configPath}' does not exists");
+            throw new ApplicationException("Config file '{$configPath}' does not exists");
         }
 
         if (is_null($section)) {
@@ -44,8 +40,7 @@ class Config {
         $fileData = parse_ini_file($configPath, false, INI_SCANNER_NORMAL);
 
         if (!is_array($fileData)) {
-            throw new ApplicationException(
-                "Some error while parsing config '{$section}'");
+            throw new ApplicationException("Some error while parsing config '{$section}'");
         }
 
         static::$_data[$section] = $fileData;
@@ -54,7 +49,6 @@ class Config {
     }
 
     /**
-     *
      * @param string $section
      * @param string $option
      * @param null|mixed $default
@@ -70,8 +64,7 @@ class Config {
                 return $default;
             }
 
-            throw new ApplicationException(
-                "Config does not have '{$section}' section");
+            throw new ApplicationException("Config does not have '{$section}' section");
         }
 
         if (!array_key_exists($option, static::$_data[$section])) {
@@ -79,8 +72,7 @@ class Config {
                 return $default;
             }
 
-            throw new ApplicationException(
-                "Config does not have '{$section}.{$option}' option");
+            throw new ApplicationException("Config does not have '{$section}.{$option}' option");
         }
 
         return static::$_data[$section][$option];
@@ -96,15 +88,13 @@ class Config {
     static public function __callStatic ($name, $arguments) {
         array_unshift($arguments, $name);
 
-        return call_user_func_array(
-            [
-                'static',
-                'get'
-            ], $arguments);
+        return call_user_func_array([
+            'static',
+            'get'
+        ], $arguments);
     }
 
     /**
-     *
      * @param string $section
      * @param string $option
      * @return string
@@ -118,15 +108,13 @@ class Config {
 
         // Stupid check a path is absolute. For Linux only.
         if ('/' !== substr($result, 0, 1)) {
-            $result = dirname(static::$_pathes[$section]) . DIRECTORY_SEPARATOR .
-                 $result;
+            $result = dirname(static::$_pathes[$section]) . DIRECTORY_SEPARATOR . $result;
         }
 
         return $result;
     }
 
     /**
-     *
      * @param string $section
      * @param string $option
      * @return integer
@@ -138,7 +126,6 @@ class Config {
     }
 
     /**
-     *
      * @return boolean
      */
     static public function isDebugSqlEnabled () {
@@ -146,7 +133,6 @@ class Config {
     }
 
     /**
-     *
      * @return boolean
      */
     static public function isDebugProfilingEnabled () {
@@ -158,7 +144,6 @@ class Config {
     }
 
     /**
-     *
      * @return boolean
      */
     static public function isDevEnv () {
@@ -166,7 +151,6 @@ class Config {
     }
 
     /**
-     *
      * @param string $section
      * @param string $option
      * @return scalar[]
@@ -176,7 +160,7 @@ class Config {
         $result = [];
 
         foreach ($parts as $part) {
-            list ($name, $value) = explode('=', $part, 2);
+            list($name, $value) = explode('=', $part, 2);
 
             if (strpos($name, ':') !== false) {
                 $name = explode(':', $name, 2)[1];

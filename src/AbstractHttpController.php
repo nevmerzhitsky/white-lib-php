@@ -12,11 +12,9 @@ class HttpControllerException extends \ApplicationException {
 }
 
 class AbstractHttpController {
-
     const PARAMS_SOURCE_JSON_POST = 'post_json';
 
     /**
-     *
      * @var string[]
      */
     protected static $_actions = [];
@@ -26,7 +24,6 @@ class AbstractHttpController {
     protected $_json;
 
     /**
-     *
      * @param string $action
      * @return mixed|null
      */
@@ -39,7 +36,6 @@ class AbstractHttpController {
     }
 
     /**
-     *
      * @param string $action
      * @return mixed|null
      */
@@ -52,8 +48,7 @@ class AbstractHttpController {
 
         // @TODO: Use Reflection to check accessability to call a method.
         if (!method_exists($this, $actionMethodName)) {
-            throw new HttpControllerException(
-                'No released handler for this action', 400);
+            throw new HttpControllerException('No released handler for this action', 400);
         }
 
         if (!$this->_prepareActionParams($action)) {
@@ -68,7 +63,6 @@ class AbstractHttpController {
     }
 
     /**
-     *
      * @param string $action
      * @return string|null
      */
@@ -88,7 +82,6 @@ class AbstractHttpController {
     }
 
     /**
-     *
      * @param string $action
      * @param string $httpMethod
      */
@@ -107,12 +100,10 @@ class AbstractHttpController {
             header('Allow: ' . implode(',', $methods));
         }
 
-        throw new HttpControllerException(
-            'Unsupported HTTP method for this action', 405);
+        throw new HttpControllerException('Unsupported HTTP method for this action', 405);
     }
 
     /**
-     *
      * @param string $action
      * @return string[]
      */
@@ -128,12 +119,11 @@ class AbstractHttpController {
     }
 
     /**
-     *
      * @param string $action
      * @return boolean
      */
     protected function _prepareActionParams ($action) {
-        list ($source, $paramsMethod) = $this->_getRequestParams($action);
+        list($source, $paramsMethod) = $this->_getRequestParams($action);
 
         if (static::PARAMS_SOURCE_JSON_POST == $source) {
             $this->_post = file_get_contents('php://input');
@@ -141,8 +131,7 @@ class AbstractHttpController {
             $this->_logRequest();
 
             if (empty($this->_post) || empty($this->_json)) {
-                throw new HttpControllerException(
-                    'Unable to parse JSON in request body', 400);
+                throw new HttpControllerException('Unable to parse JSON in request body', 400);
             }
         }
 
@@ -156,10 +145,8 @@ class AbstractHttpController {
     }
 
     /**
-     *
      * @param string $action
-     * @return [string, callback] First is alias of source for params in a
-     *         request, second is callback to more specific params initializer.
+     * @return [string, callback] First is alias of source for params in a request, second is callback to more specific params initializer.
      */
     protected function _getRequestParams ($action) {
         static $nullResult = [
@@ -203,8 +190,8 @@ class AbstractHttpController {
         }
 
         file_put_contents($logPath,
-            sprintf('[%s] %s %s' . PHP_EOL, date('Y-m-d H:i:s'),
-                $_SERVER['REQUEST_URI'], $this->_post), FILE_APPEND);
+            sprintf('[%s] %s %s' . PHP_EOL, date('Y-m-d H:i:s'), $_SERVER['REQUEST_URI'],
+                $this->_post), FILE_APPEND);
     }
 
     private function _saveProfilingInfo () {

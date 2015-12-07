@@ -4,71 +4,39 @@
  * Filter for and SQL-queries by WHERE statement.
  */
 interface QueryWhere {
-
     const OP_EQ = '=';
-
     const OP_NEQ = '!=';
-
     const OP_GT = '>';
-
     const OP_GE = '>=';
-
     const OP_LT = '<';
-
     const OP_LE = '<=';
-
     const OP_LIKE = 'LIKE';
-
     const OP_NLIKE = 'NOT LIKE';
-
     const OP_ILIKE = 'ILIKE';
-
     const OP_NILIKE = 'NOT ILIKE';
-
     const OP_CONTAINS = '@>';
-
     const OP_NCONTAINS = 'NOT @>';
-
     const OP_CONTAINED = '<@';
-
     const OP_NCONTAINED = 'NOT <@';
-
     const OP_OVERLAP = '&&';
-
     const OP_NOVERLAP = 'NOT &&';
-
     const OP_INET_CONTAINED = '<<';
-
     const OP_INET_NCONTAINED = 'NOT <<';
-
     const OP_INET_CONTAINED_EQUAL = '<<=';
-
     const OP_INET_NCONTAINED_EQUAL = 'NOT <<=';
-
     const OP_INET_CONTAINS = '>>';
-
     const OP_INET_NCONTAINS = 'NOT >>';
-
     const OP_INET_CONTAINS_EQUAL = '>>=';
-
     const OP_INET_NCONTAINS_EQUAL = 'NOT >>=';
-
     const OP_IN = 'IN';
-
     const OP_NIN = 'NOT IN';
-
     const OP_ISNULL = 'IS NULL';
-
     const OP_NOTNULL = 'IS NOT NULL';
-
     const OP_BETWEEN = 'BETWEEN';
-
     const ARRAY_SUF_ANY = 'ANY';
-
     const ARRAY_SUF_ALL = 'ALL';
 
     /**
-     *
      * @return string[]
      */
     static function getAvailableOperators ();
@@ -78,32 +46,27 @@ interface QueryWhere {
     function addFields (array $fields);
 
     /**
-     *
      * @param string $alias
      * @param string $sqlForm
      */
     function addField ($alias, $sqlForm = null);
 
-    function addSimpleCondition ($field, $value, $operator = self::OP_EQ,
-        $arraySuffix = null);
+    function addSimpleCondition ($field, $value, $operator = self::OP_EQ, $arraySuffix = null);
 
     function clearAllConditions ();
 
     /**
-     *
      * @param string $sqlCondition
      */
     function addSqlCondition ($sqlCondition);
 
     /**
-     *
      * @param integer $counter
      * @return string
      */
     function getWhere (&$counter = 1);
 
     /**
-     *
      * @param integer $counter
      * @return scalar[]
      */
@@ -162,33 +125,26 @@ abstract class AbstractQueryWhere implements QueryWhere {
             static::ARRAY_SUF_ANY
         ];
     }
-
     const SIMPLE_VALUE = 'value';
-
     const SIMPLE_OPERATOR = 'operator';
-
     const SIMPLE_ARRAY_SUFFIX = 'array_suffix';
 
     /**
-     *
      * @var scalar[]
      */
     protected $_simpleConditions = [];
 
     /**
-     *
      * @var string[]
      */
     protected $_rawConditions = [];
 
     /**
-     *
      * @var QueryWhere[]
      */
     protected $_conditions = [];
 
     /**
-     *
      * @var string[]
      */
     protected $_fields = [];
@@ -215,10 +171,8 @@ abstract class AbstractQueryWhere implements QueryWhere {
             $sqlForm = $alias;
         }
 
-        if (array_key_exists($alias, $this->_fields) &&
-             $this->_fields[$alias] != $sqlForm) {
-            throw new ApplicationException(
-                "You have collision for QueryWhere field '{$alias}'");
+        if (array_key_exists($alias, $this->_fields) && $this->_fields[$alias] != $sqlForm) {
+            throw new ApplicationException("You have collision for QueryWhere field '{$alias}'");
         }
 
         $this->_fields[$alias] = $sqlForm;
@@ -228,15 +182,12 @@ abstract class AbstractQueryWhere implements QueryWhere {
         }
     }
 
-    public function addSimpleCondition ($field, $value, $operator = self::OP_EQ,
-        $arraySuffix = null) {
+    public function addSimpleCondition ($field, $value, $operator = self::OP_EQ, $arraySuffix = null) {
         if (!in_array($operator, static::getAvailableOperators())) {
             throw new ApplicationException("Unknown operator '{$operator}'");
         }
-        if (!is_null($arraySuffix) &&
-             !in_array($arraySuffix, static::getAvailableArraySuffixes())) {
-            throw new ApplicationException(
-                "Unknown array suffix '{$arraySuffix}'");
+        if (!is_null($arraySuffix) && !in_array($arraySuffix, static::getAvailableArraySuffixes())) {
+            throw new ApplicationException("Unknown array suffix '{$arraySuffix}'");
         }
         if (!array_key_exists($field, $this->_simpleConditions)) {
             throw new ApplicationException("Not inited field '{$field}'");
@@ -274,7 +225,6 @@ abstract class AbstractQueryWhere implements QueryWhere {
     }
 
     /**
-     *
      * @param string $field
      */
     public function clearSimpleCondition ($field) {
@@ -284,7 +234,6 @@ abstract class AbstractQueryWhere implements QueryWhere {
     }
 
     /**
-     *
      * @return boolean
      */
     protected function _isHaveConditions () {
@@ -293,7 +242,6 @@ abstract class AbstractQueryWhere implements QueryWhere {
     }
 
     /**
-     *
      * @param integer $counter
      * @return array
      */
@@ -303,8 +251,8 @@ abstract class AbstractQueryWhere implements QueryWhere {
         // @TODO Complete logic for various comparison operators (BETWEEN).
         foreach ($this->_simpleConditions as $alias => $values) {
             foreach ($values as $settings) {
-                $result[] = $this->_valueToWhere($this->_fields[$alias],
-                    $alias . $counter++, $settings);
+                $result[] = $this->_valueToWhere($this->_fields[$alias], $alias . $counter++,
+                    $settings);
             }
         }
 
@@ -336,10 +284,8 @@ abstract class AbstractQueryWhere implements QueryWhere {
 
                     $result[$alias . $counter . '_from'] = $settings[static::SIMPLE_VALUE][0];
                     $result[$alias . $counter . '_to'] = $settings[static::SIMPLE_VALUE][1];
-                } elseif (!in_array($settings[static::SIMPLE_OPERATOR],
-                    static::$_UNARY_OPS) &&
-                     !in_array($settings[static::SIMPLE_OPERATOR],
-                        static::$_NOBIND_OPS)) {
+                } elseif (!in_array($settings[static::SIMPLE_OPERATOR], static::$_UNARY_OPS) && !in_array(
+                    $settings[static::SIMPLE_OPERATOR], static::$_NOBIND_OPS)) {
                     $result[$alias . $counter] = $settings[static::SIMPLE_VALUE];
                 }
 
@@ -361,7 +307,6 @@ abstract class AbstractQueryWhere implements QueryWhere {
     }
 
     /**
-     *
      * @param string $sqlForm
      * @param string $paramName
      * @param array[] $settings
@@ -369,13 +314,11 @@ abstract class AbstractQueryWhere implements QueryWhere {
      */
     protected function _valueToWhere ($sqlForm, $paramName, array $settings) {
         if (in_array($settings[static::SIMPLE_OPERATOR], static::$_UNARY_OPS)) {
-            return sprintf('%s %s', $sqlForm,
-                $settings[static::SIMPLE_OPERATOR]);
+            return sprintf('%s %s', $sqlForm, $settings[static::SIMPLE_OPERATOR]);
         }
 
         if (!is_null($settings[static::SIMPLE_ARRAY_SUFFIX])) {
-            return sprintf(':%s %s %s (%s)', $paramName,
-                $settings[static::SIMPLE_OPERATOR],
+            return sprintf(':%s %s %s (%s)', $paramName, $settings[static::SIMPLE_OPERATOR],
                 $settings[static::SIMPLE_ARRAY_SUFFIX], $sqlForm);
         }
 
@@ -385,8 +328,7 @@ abstract class AbstractQueryWhere implements QueryWhere {
                     "Argument for '{$sqlForm}' ({$paramName}) should be array");
             }
 
-            return sprintf('%s %s (%s)', $sqlForm,
-                $settings[static::SIMPLE_OPERATOR],
+            return sprintf('%s %s (%s)', $sqlForm, $settings[static::SIMPLE_OPERATOR],
                 implode(',', quote_array($settings[static::SIMPLE_VALUE])));
         }
 
@@ -398,8 +340,7 @@ abstract class AbstractQueryWhere implements QueryWhere {
                 $settings[static::SIMPLE_OPERATOR], $paramName);
         }
 
-        return sprintf('%s %s (:%s)', $sqlForm,
-            $settings[static::SIMPLE_OPERATOR], $paramName);
+        return sprintf('%s %s (:%s)', $sqlForm, $settings[static::SIMPLE_OPERATOR], $paramName);
     }
 }
 

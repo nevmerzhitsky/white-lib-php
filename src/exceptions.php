@@ -1,5 +1,7 @@
 <?php
 
-class ApplicationException extends Exception {}
+class ApplicationException extends Exception {
+}
 
-class DatabaseException extends ApplicationException {}
+class DatabaseException extends ApplicationException {
+}

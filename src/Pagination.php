@@ -3,28 +3,23 @@
 class Pagination {
 
     /**
-     *
      * @var integer
      */
     private $_totalCount = 0;
 
     /**
-     *
      * @var integer
      */
     private $_onPage = 20;
 
     /**
-     *
      * @var integer
      */
     private $_totalPages = 0;
 
     /**
-     *
      * @param integer $totalCount
-     * @param integer|null $onPage Count of element on page. -1 for all on one
-     *        page.
+     * @param integer|null $onPage Count of element on page. -1 for all on one page.
      */
     public function __construct ($totalCount, $onPage) {
         $this->_totalCount = max(intval($totalCount), 0);
@@ -40,7 +35,6 @@ class Pagination {
     }
 
     /**
-     *
      * @return integer
      */
     public function getTotalCount () {
@@ -48,7 +42,6 @@ class Pagination {
     }
 
     /**
-     *
      * @param integer $pageNumber
      * @return [integer, integer]
      */
@@ -81,7 +74,6 @@ class Pagination {
     }
 
     /**
-     *
      * @param integer $pageNumber
      * @param integer $neighbors
      * @param boolean $alwaysEdges
@@ -96,8 +88,7 @@ class Pagination {
         $totalElements = $neighbors * 2 + 1;
         $first = $pageNumber - $neighbors;
         $first = max($first, 1);
-        $last = $pageNumber + $neighbors +
-             abs(min($pageNumber - $neighbors - 1, 0));
+        $last = $pageNumber + $neighbors + abs(min($pageNumber - $neighbors - 1, 0));
         $last = min($last, $this->_totalPages);
         $last = max($last, $first);
 
@@ -126,7 +117,6 @@ class Pagination {
     }
 
     /**
-     *
      * @param array $nav return string
      */
     public function renderNav (array $nav, $urlPrefix) {
@@ -153,7 +143,6 @@ HTML;
     }
 
     /**
-     *
      * @param integer $page
      * @param array $nav
      * @return array
@@ -169,14 +158,12 @@ HTML;
     }
 
     /**
-     *
      * @param integer $pageNumber
      * @param integer $neighbors
      * @param boolean $alwaysEdges
      * @return array
      */
-    public function getNavForJson ($pageNumber, $neighbors = 3,
-        $alwaysEdges = true) {
+    public function getNavForJson ($pageNumber, $neighbors = 3, $alwaysEdges = true) {
         $nav = $this->getNav($pageNumber, $neighbors, $alwaysEdges);
 
         return [

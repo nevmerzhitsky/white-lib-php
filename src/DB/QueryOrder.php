@@ -4,19 +4,13 @@
  * Constructir of ORDER BY clause of SQL-queries.
  */
 class QueryOrder {
-
     const _STRUCT_SQL = 'sql_cond';
-
     const _STRUCT_DIRECTION = 'direction';
-
     const DIR_ASC = 'ASC';
-
     const DIR_DESC = 'DESC';
-
     const DEFAULT_DIR = self::DIR_ASC;
 
     /**
-     *
      * @return string[]
      */
     static public function getAvailableDirections () {
@@ -27,19 +21,16 @@ class QueryOrder {
     }
 
     /**
-     *
      * @var string[]
      */
     protected $_conditions = [];
 
     /**
-     *
      * @var string[]
      */
     protected $_defaultOrder = [];
 
     /**
-     *
      * @var string[]
      */
     protected $_order = [];
@@ -57,8 +48,7 @@ class QueryOrder {
 
         foreach ($aliases as $alias) {
             if (!array_key_exists($alias, $this->_conditions)) {
-                throw new ApplicationException(
-                    "Not initialized condition '{$alias}'");
+                throw new ApplicationException("Not initialized condition '{$alias}'");
             }
         }
     }
@@ -74,7 +64,7 @@ class QueryOrder {
                         'Condition of QueryOrder in array-form should have exact two values');
                 }
 
-                list ($sqlForm, $direction) = $sqlForm;
+                list($sqlForm, $direction) = $sqlForm;
             } else {
                 $direction = self::DEFAULT_DIR;
             }
@@ -87,16 +77,13 @@ class QueryOrder {
         }
     }
 
-    public function addCondition ($alias, $sqlForm = null,
-        $direction = self::DEFAULT_DIR) {
+    public function addCondition ($alias, $sqlForm = null, $direction = self::DEFAULT_DIR) {
         if (empty($sqlForm)) {
             $sqlForm = $alias;
         }
 
-        if (array_key_exists($alias, $this->_conditions) &&
-             $this->_conditions[$alias][self::_STRUCT_SQL] != $sqlForm) {
-            throw new ApplicationException(
-                "You have collision for QueryOrder condition '{$alias}'");
+        if (array_key_exists($alias, $this->_conditions) && $this->_conditions[$alias][self::_STRUCT_SQL] != $sqlForm) {
+            throw new ApplicationException("You have collision for QueryOrder condition '{$alias}'");
         }
 
         $this->_conditions[$alias] = [
@@ -125,7 +112,6 @@ class QueryOrder {
     }
 
     /**
-     *
      * @return string[] List of conditions alises.
      */
     public function getConditionsOrder () {
@@ -151,8 +137,7 @@ class QueryOrder {
     /**
      * Move some conditions to the top of order.
      *
-     * @param string[]|string $aliases Condition aliases array or one condition
-     *        alias.
+     * @param string[]|string $aliases Condition aliases array or one condition alias.
      */
     public function raiseConditionsInOrder ($aliases) {
         if (!is_array($aliases)) {
@@ -181,15 +166,13 @@ class QueryOrder {
     }
 
     /**
-     *
      * @return string SQL-clause ORDER BY or empty string.
      */
     public function getOrderBy () {
         $conds = [];
 
         foreach ($this->getConditionsOrder() as $alias) {
-            $conds[] = sprintf('%s %s',
-                $this->_conditions[$alias][self::_STRUCT_SQL],
+            $conds[] = sprintf('%s %s', $this->_conditions[$alias][self::_STRUCT_SQL],
                 $this->_conditions[$alias][self::_STRUCT_DIRECTION]);
         }
 
@@ -197,6 +180,6 @@ class QueryOrder {
             return '';
         }
 
-        return 'ORDER BY ' . implode(', ', $conds) .' NULLS LAST';
+        return 'ORDER BY ' . implode(', ', $conds) . ' NULLS LAST';
     }
 }

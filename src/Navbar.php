@@ -3,7 +3,6 @@
 class Navbar {
 
     /**
-     *
      * @var array
      */
     private $_elements = [];
@@ -13,7 +12,6 @@ class Navbar {
     }
 
     /**
-     *
      * @return array
      */
     public function getElements () {
@@ -21,7 +19,6 @@ class Navbar {
     }
 
     /**
-     *
      * @param array $simpleData Nav elements in format text=>link
      * @return array
      */
@@ -56,7 +53,6 @@ class Navbar {
     }
 
     /**
-     *
      * @return string|null
      */
     public function getIndexUrn () {
@@ -68,7 +64,6 @@ class Navbar {
     }
 
     /**
-     *
      * @param string $requestUrl
      */
     public function initForUrl ($requestUrl) {

@@ -7,13 +7,11 @@
 trait ExecutionTimes {
 
     /**
-     *
      * @var float[]
      */
     private $_executionTimes = [];
 
     /**
-     *
      * @return float[]
      */
     public function getExecutionTimes () {
@@ -47,7 +45,6 @@ trait ExecutionTimes {
     }
 
     /**
-     *
      * @return float
      */
     public function getTotalExecutionTime () {
