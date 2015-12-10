@@ -458,3 +458,36 @@ function sortDbRowset (array &$result, array $sortRules) {
 
     call_user_func_array('array_multisort', $sortParams);
 }
+
+/**
+ * @param string $path
+ * @param string $mode
+ * @param boolean $trimLine
+ * @param boolean $skipEmptyLines
+ * @return Generator
+ */
+function textFileLineIterator ($path, $mode = 'r', $trimLine = true, $skipEmptyLines = true) {
+    if (!is_file($path) || !is_readable($path)) {
+        return;
+    }
+
+    if (($fp = fopen($path, $mode)) === false) {
+        throw new ApplicationException('Cannot open file');
+    }
+
+    while (!feof($fp)) {
+        $line = fgets($fp);
+
+        if (!empty($trimLine)) {
+            $line = trim($line);
+        }
+
+        if (empty($line) && !empty($skipEmptyLines)) {
+            continue;
+        }
+
+        yield $line;
+    }
+
+    fclose($fp);
+}
