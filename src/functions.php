@@ -251,6 +251,25 @@ function db_update_set (array $fields, array $placeholders, $fieldsPrepared = tr
 }
 
 /**
+ * Construct SQL-query for UPSERT.
+ *
+ * @param string $sql Table with nv alias should be exists.
+ * @param string[] $fieldsAndCast Array of castings. For ex. ['name' => 'TEXT']
+ * @param scalar[] $defaultValues Array of default values for fields.
+ * @return string SQL-query with placeholders.
+ */
+function db_form_upsert_query ($sql, array $fieldsAndCast, array $defaultValues) {
+    $fieldsList = db_quote_names(array_keys($fieldsAndCast));
+    $fieldsPlaceholders = db_create_placeholders(array_keys($fieldsAndCast), $fieldsAndCast);
+    $nvFieldsList = array_map(function  ($v) {
+        return "nv.{$v}";
+    }, $fieldsList);
+    $updateSet = db_update_set($fieldsList, $nvFieldsList);
+
+    return sprintf($sql, implode(', ', $fieldsList), implode(', ', $fieldsPlaceholders), $updateSet);
+}
+
+/**
  * @param string $field SQL-condition of field name.
  * @param array $data List of strings.
  * @param \PDO $db If null then getDb() will called.
