@@ -255,10 +255,9 @@ function db_update_set (array $fields, array $placeholders, $fieldsPrepared = tr
  *
  * @param string $sql Table with nv alias should be exists.
  * @param string[] $fieldsAndCast Array of castings. For ex. ['name' => 'TEXT']
- * @param scalar[] $defaultValues Array of default values for fields.
  * @return string SQL-query with placeholders.
  */
-function db_form_upsert_query ($sql, array $fieldsAndCast, array $defaultValues) {
+function db_form_upsert_query ($sql, array $fieldsAndCast) {
     $fieldsList = db_quote_names(array_keys($fieldsAndCast));
     $fieldsPlaceholders = db_create_placeholders(array_keys($fieldsAndCast), $fieldsAndCast);
     $nvFieldsList = array_map(function  ($v) {
