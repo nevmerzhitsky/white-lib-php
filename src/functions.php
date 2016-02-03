@@ -532,3 +532,20 @@ function gen_uuidv4 () {
         // 48 bits for "node"
         mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
 }
+
+/**
+ * Fix for unpack('N') on system with INT_SIZE == 4.
+ *
+ * @link http://php.net/manual/ru/function.unpack.php#106041
+ * @param string $bytes The binary 32-bit BE string that represents the integer.
+ * @return integer
+ */
+function unpack_uint32be ($bytes) {
+    if (PHP_INT_SIZE <= 4) {
+        list(, $h, $l) = unpack('n*', $bytes);
+        return ($l + ($h * 0x010000));
+    }
+
+    list(, $int) = unpack('N', $bytes);
+    return $int;
+}
