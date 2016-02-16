@@ -193,7 +193,7 @@ function db_quote_array (array $values, \PDO $db = null) {
 
     $result = $values;
     $result = array_map(
-        function  ($v) use( $db) {
+        function  ($v) use ( $db) {
             return !is_null($v) ? $db->quote($v) : null;
         }, $result);
     $result = array_filter($result);
@@ -220,7 +220,7 @@ function db_quote_names (array $names) {
  */
 function db_create_placeholders (array $names, array $casts = []) {
     return array_map(
-        function  ($f) use( $casts) {
+        function  ($f) use ( $casts) {
             $result = ":{$f}";
 
             if (array_key_exists($f, $casts)) {
@@ -433,7 +433,7 @@ function pgInsertByCopy (PDO $db, $tableName, array $fields, array $records) {
 
     foreach ($records as $record) {
         $record = array_map(
-            function  ($field) use( $record, $delimiter, $nullAs, $escapingChars) {
+            function  ($field) use ( $record, $delimiter, $nullAs, $escapingChars) {
                 $value = array_key_exists($field, $record) ? $record[$field] : null;
 
                 if (is_null($value)) {
@@ -467,6 +467,10 @@ function sortDbRowset (array &$result, array $sortRules) {
 
     foreach ($result as $key => $data) {
         foreach (array_keys($columns) as $field) {
+            if (!array_key_exists($field, $data)) {
+                continue;
+            }
+
             $columns[$field][$key] = $data[$field];
         }
     }

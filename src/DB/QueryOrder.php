@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Constructir of ORDER BY clause of SQL-queries.
+ * Constructor of ORDER BY clause of SQL-queries.
  */
 class QueryOrder {
     const _STRUCT_SQL = 'sql_cond';
@@ -181,5 +181,19 @@ class QueryOrder {
         }
 
         return 'ORDER BY ' . implode(', ', $conds) . ' NULLS LAST';
+    }
+
+    /**
+     * @return string[string]
+     */
+    public function getOrderByForPhp () {
+        $result = [];
+
+        foreach ($this->getConditionsOrder() as $alias) {
+            $dir = $this->_conditions[$alias][self::_STRUCT_DIRECTION];
+            $result[$alias] = $dir == static::DIR_ASC ? SORT_ASC : SORT_DESC;
+        }
+
+        return $result;
     }
 }
