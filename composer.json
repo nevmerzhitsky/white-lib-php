@@ -1,6 +1,6 @@
 {
     "name": "whitecode/white-lib-php",
-    "description": "General purpose PHP library for web-applications.",
+    "description": "General purpose PHP library for WhiteCode LLC projects.",
     "keywords": ["whitecode"],
     "homepage": "http://whitecode.ru",
     "authors": [
