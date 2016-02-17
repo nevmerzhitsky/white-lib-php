@@ -3,7 +3,7 @@ namespace Service;
 
 class ApiController {
 
-    public function dispatch ($controller, $action) {
+    public function dispatch ($controller, $action, $namespace = '') {
         try {
             $controller = trim($controller);
             $action = trim($action);
@@ -12,7 +12,7 @@ class ApiController {
                 throw new \HttpControllerException('No controller or action in request', 400);
             }
 
-            $controllerClassName = __NAMESPACE__ . "\\{$controller}Controller";
+            $controllerClassName = "{$namespace}\\{$controller}Controller";
 
             if (!class_exists($controllerClassName)) {
                 throw new \HttpControllerException('No handler for this controller name', 400);
