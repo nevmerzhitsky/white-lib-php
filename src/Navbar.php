@@ -91,7 +91,7 @@ class Navbar {
         }
     }
 
-    public function renderHtml ($caption) {
+    public function renderHtml ($caption, $logoUrl = '/') {
         $html = [];
 
         foreach ($this->getElements() as $navElement) {
@@ -147,7 +147,7 @@ HTML;
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">{$caption}</a>
+            <a class="navbar-brand" href="{$logoUrl}">{$caption}</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">{$html}</ul>
